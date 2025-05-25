@@ -1,0 +1,33 @@
+[submodule "lib/SDL"]
+	path = lib/SDL
+	url = https://github.com/libsdl-org/SDL
+[submodule "lib/SDL_image"]
+	path = lib/SDL_image
+	url = https://github.com/libsdl-org/SDL_image
+[submodule "lib/cimgui"]
+	path = lib/cimgui
+	url = https://github.com/cimgui/cimgui
+[submodule "lib/soloud"]
+	path = lib/soloud
+	url = https://github.com/jarikomppa/soloud
+[submodule "lib/sokol"]
+	path = lib/sokol
+	url = https://github.com/floooh/sokol
+[submodule "lib/sokol-tools-bin"]
+	path = lib/sokol-tools-bin
+	url = https://github.com/floooh/sokol-tools-bin
+[submodule "lib/cglm"]
+	path = lib/cglm
+	url = https://github.com/recp/cglm
+[submodule "lib/SDL_Image"]
+	path = lib/SDL_Image
+	url = https://github.com/libsdl-org/SDL_Image
+[submodule "lib/glutess"]
+	path = lib/glutess
+	url = https://github.com/mlabbe/glutess
+[submodule "lib/sokol_gp"]
+	path = lib/sokol_gp
+	url = https://github.com/edubart/sokol_gp
+[submodule "lib/sokol-tools"]
+	path = lib/sokol-tools
+	url = https://github.com/floooh/sokol-tools

@@ -1,0 +1,59 @@
+FFONT0 ffont0.png
+
+OBOY0 oboy0.png
+
+TEST test.png
+TWRED TEST 0 0 16 16
+TWBLU TEST 16 0 16 16
+TWGRN TEST 32 0 16 16
+TWYEL TEST 48 0 16 16
+TWSML TEST 64 0 16 16
+TWBAR TEST 80 0 16 16
+
+SPSTN spstn.png
+PSTN1 SPSTN 0 0 64 64
+PSTN2 SPSTN 64 0 64 64
+PSTN3 SPSTN 128 0 64 64
+
+# enemies
+OBOY0 oboy0.png
+OPROJ1 oproj1.png
+OPROJ2 oproj2.png
+
+# internal
+XSPAWN xspawn.png
+XHOLE xhole.png
+
+IGUN4 igun4.png
+PPART0 ppart0.png
+PPART1 ppart1.png
+
+# ui
+HGUN0 hgun0.png
+HGUN1 hgun1.png
+HGUN2 hgun2.png
+HGUN3 hgun3.png
+HGUN4A hgun4a.png
+HGUN4B hgun4b.png
+HGUN4C hgun4c.png
+HGUN4D hgun4d.png
+HFLASH0 hflash0.png
+
+#
+# DPORT0 0 dport0.png 1
+# DPORT1 0 dport1.png 1
+#
+# # remove me
+# TJUICEX 0 tjuicex.png 1
+# TJUICE0 1 TJUICEX 0 0 16 16
+# TJUICE1 1 TJUICEX 16 0 16 16
+# TJUICE2 1 TJUICEX 32 0 16 16
+#
+# OVIL0 0 ovil0.png 1
+# XMAR0 0 xmar0.png 1
+# XTEST0 0 xtest0.png 0
+#
+# WTEST0 0 wtest0.png 1
+# WTEST1 0 wtest1.png 1
+#
+# PTEST0 0 ptest0.png 1
