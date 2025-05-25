@@ -20,9 +20,9 @@ typedef struct {
 
 	// sokol-gfx resources
 	gfx_resources_t gfx;
-	void *sg_state;  		// sokol-gfx state
-	void *sgp_state; 		// sokol-gp state
-	void *simgui_state; 	// sokol-imgui state
+	void *sg_state;
+	void *sgp_state;
+	void *simgui_state;
 
 	// object state
 	triangle_t triangle;

@@ -23,7 +23,6 @@
 
 #include "../old/util/math.h"
 
-// AABB type for 2D float coordinates
 struct aabbf {
     vec2s min;
     vec2s max;

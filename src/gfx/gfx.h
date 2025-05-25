@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <sokol_gfx.h>
 
-// sokol-gfx resource types
 typedef struct {
     sg_buffer vbuf;
     sg_shader shd;

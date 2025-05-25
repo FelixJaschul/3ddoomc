@@ -33,6 +33,3 @@ char* shader_load_file(const char* path) {
     fclose(file);
     return buffer;
 }
-
-// Remove all OpenGL code below this line
-

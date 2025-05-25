@@ -63,7 +63,7 @@ bin/src/main.o: src/main.c lib/cglm/include/cglm/cglm.h \
   lib/SDL/include/SDL_version.h lib/SDL/include/SDL_locale.h \
   lib/SDL/include/SDL_misc.h lib/SDL_image/include/SDL_image.h \
   src/shaders/shader.h src/state.h src/objects/triangle.h src/config.h \
-  src/ui/debug_ui.h
+  src/editor/ui.h
 lib/cglm/include/cglm/cglm.h:
 lib/cglm/include/cglm/common.h:
 lib/cglm/include/cglm/types.h:
@@ -183,4 +183,4 @@ src/shaders/shader.h:
 src/state.h:
 src/objects/triangle.h:
 src/config.h:
-src/ui/debug_ui.h:
+src/editor/ui.h:

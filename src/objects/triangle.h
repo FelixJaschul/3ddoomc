@@ -3,14 +3,13 @@
 #include <cglm/cglm.h>
 #include <stdbool.h>
 
-// define the triangle_t struct
 typedef struct {
 
-	vec3 vertices[3];  // Triangle vertices
-	vec3 color;        // Triangle color
-	float rotation;    // Rotation in radians
-	float scale;       // Scale factor
-	bool selected;     // Whether this object is selected
+	vec3 vertices[3];
+	vec3 color;
+	float rotation;
+	float scale;
+	bool selected;
 
 } triangle_t;
 

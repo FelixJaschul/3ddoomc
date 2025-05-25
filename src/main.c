@@ -283,53 +283,41 @@ int main() {
 			.dpi_scale = 1.0f
 		});
 
-		// Draw all debug UI windows
 		draw_ui_debug(state);
 
-		// Render frame
+		// render frame
 		sg_pass_action pass_action = {
 			.colors[0] = { .action = SG_ACTION_CLEAR, .value = { 0.2f, 0.25f, 0.3f, 1.0f } }
 		};
 
 		sg_begin_default_pass(&pass_action, state->WIDTH, state->HEIGHT);
 		
-		// Calculate Model, View, Projection matrices
 		mat4 identity = GLM_MAT4_IDENTITY_INIT;
 
-		// Model matrix (translate, rotate, scale the triangle)
 		glm_mat4_copy(identity, state->model_matrix);
 
-		// Apply rotation from state->triangle.rotation
 		glm_rotate(state->model_matrix, state->triangle.rotation, (vec3){0.0f, 0.0f, 1.0f}); // Rotate around Z axis
 
-		// Apply scale from state->triangle.scale
 		glm_scale(state->model_matrix, (vec3){state->triangle.scale, state->triangle.scale, state->triangle.scale});
 
-		// View matrix (camera)
-		// For a simple setup, let's position the camera looking towards the origin
-		vec3 camera_pos = {0.0f, 0.0f, 2.0f}; // Camera position
-		vec3 camera_target = {0.0f, 0.0f, 0.0f}; // Point camera is looking at
-		vec3 camera_up = {0.0f, 1.0f, 0.0f}; // Up direction
+		vec3 camera_pos = {0.0f, 0.0f, 2.0f};
+		vec3 camera_target = {0.0f, 0.0f, 0.0f};
+		vec3 camera_up = {0.0f, 1.0f, 0.0f};
 		glm_lookat(camera_pos, camera_target, camera_up, state->view_matrix);
 
-		// Projection matrix
 		float aspect_ratio = (float)state->WIDTH / (float)state->HEIGHT;
-		glm_perspective(glm_rad(45.0f), aspect_ratio, 0.1f, 100.0f, state->projection_matrix); // 45 degree FOV, aspect ratio, near/far plane
+		glm_perspective(glm_rad(45.0f), aspect_ratio, 0.1f, 100.0f, state->projection_matrix);
 
-		// Update vertex buffer with current triangle data
 		sg_update_buffer(state->gfx.vbuf, &(sg_range){.ptr = state->triangle.vertices, .size = sizeof(state->triangle.vertices)});
 
-		// Draw triangle
 		sg_apply_pipeline(state->gfx.pip);
 		sg_apply_bindings(&(sg_bindings){
 			.vertex_buffers[0] = state->gfx.vbuf
 		});
 
-		// Apply uniforms
-		// Apply all uniforms in one block at slot 0
 		struct {
 			vec3 color;
-			float _pad1; // Padding to align vec3 to vec4
+			float _pad1;
 			mat4 model;
 			mat4 view;
 			mat4 projection;
