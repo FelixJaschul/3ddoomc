@@ -62,8 +62,10 @@ bin/src/main.o: src/main.c lib/cglm/include/cglm/cglm.h \
   lib/SDL/include/SDL_system.h lib/SDL/include/SDL_timer.h \
   lib/SDL/include/SDL_version.h lib/SDL/include/SDL_locale.h \
   lib/SDL/include/SDL_misc.h lib/SDL_image/include/SDL_image.h \
-  src/shaders/shader.h src/state.h src/objects/triangle.h src/config.h \
-  src/editor/ui.h
+  src/shaders/shader.h src/state.h src/defs.h src/util/types.h \
+  src/util/macros.h src/config.h src/editor/editor.h \
+  src/editor/../defs.h src/objects/object.h src/objects/../defs.h \
+  src/objects/triangle.h src/objects/cube.h src/editor/ui.h
 lib/cglm/include/cglm/cglm.h:
 lib/cglm/include/cglm/common.h:
 lib/cglm/include/cglm/types.h:
@@ -181,6 +183,14 @@ lib/SDL/include/SDL_misc.h:
 lib/SDL_image/include/SDL_image.h:
 src/shaders/shader.h:
 src/state.h:
-src/objects/triangle.h:
+src/defs.h:
+src/util/types.h:
+src/util/macros.h:
 src/config.h:
+src/editor/editor.h:
+src/editor/../defs.h:
+src/objects/object.h:
+src/objects/../defs.h:
+src/objects/triangle.h:
+src/objects/cube.h:
 src/editor/ui.h:

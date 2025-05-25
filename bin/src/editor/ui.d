@@ -1,5 +1,5 @@
 bin/src/editor/ui.o: src/editor/ui.c src/editor/ui.h src/state.h \
-  src/sdl2.h lib/SDL/include/SDL.h lib/SDL/include/SDL_main.h \
+  lib/SDL/include/SDL.h lib/SDL/include/SDL_main.h \
   lib/SDL/include/SDL_stdinc.h lib/SDL/include/SDL_config.h \
   lib/SDL/include/SDL_platform.h lib/SDL/include/begin_code.h \
   lib/SDL/include/close_code.h lib/SDL/include/SDL_config_macosx.h \
@@ -24,8 +24,9 @@ bin/src/editor/ui.o: src/editor/ui.c src/editor/ui.h src/state.h \
   lib/SDL/include/SDL_render.h lib/SDL/include/SDL_shape.h \
   lib/SDL/include/SDL_system.h lib/SDL/include/SDL_timer.h \
   lib/SDL/include/SDL_version.h lib/SDL/include/SDL_locale.h \
-  lib/SDL/include/SDL_misc.h lib/SDL_image/include/SDL_image.h \
-  src/imgui.h lib/cimgui/cimgui.h src/gfx/gfx.h lib/sokol/sokol_gfx.h \
+  lib/SDL/include/SDL_misc.h lib/sokol/sokol_gfx.h \
+  lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gfx_imgui.h \
+  lib/sokol/util/sokol_gl.h lib/sokol/util/sokol_imgui.h \
   lib/cglm/include/cglm/cglm.h lib/cglm/include/cglm/common.h \
   lib/cglm/include/cglm/types.h lib/cglm/include/cglm/simd/intrin.h \
   lib/cglm/include/cglm/simd/arm.h lib/cglm/include/cglm/vec2.h \
@@ -61,10 +62,14 @@ bin/src/editor/ui.o: src/editor/ui.c src/editor/ui.h src/state.h \
   lib/cglm/include/cglm/sphere.h lib/cglm/include/cglm/ease.h \
   lib/cglm/include/cglm/curve.h lib/cglm/include/cglm/bezier.h \
   lib/cglm/include/cglm/ray.h lib/cglm/include/cglm/affine2d.h \
-  src/objects/triangle.h
+  src/defs.h src/util/types.h src/util/macros.h src/config.h \
+  src/editor/editor.h src/editor/../defs.h src/objects/object.h \
+  src/objects/../defs.h src/objects/triangle.h src/objects/cube.h \
+  src/imgui.h lib/cimgui/cimgui.h src/editor/../state.h \
+  src/editor/../objects/object.h src/editor/../objects/triangle.h \
+  src/editor/../objects/cube.h
 src/editor/ui.h:
 src/state.h:
-src/sdl2.h:
 lib/SDL/include/SDL.h:
 lib/SDL/include/SDL_main.h:
 lib/SDL/include/SDL_stdinc.h:
@@ -116,11 +121,11 @@ lib/SDL/include/SDL_timer.h:
 lib/SDL/include/SDL_version.h:
 lib/SDL/include/SDL_locale.h:
 lib/SDL/include/SDL_misc.h:
-lib/SDL_image/include/SDL_image.h:
-src/imgui.h:
-lib/cimgui/cimgui.h:
-src/gfx/gfx.h:
 lib/sokol/sokol_gfx.h:
+lib/sokol_gp/sokol_gp.h:
+lib/sokol/util/sokol_gfx_imgui.h:
+lib/sokol/util/sokol_gl.h:
+lib/sokol/util/sokol_imgui.h:
 lib/cglm/include/cglm/cglm.h:
 lib/cglm/include/cglm/common.h:
 lib/cglm/include/cglm/types.h:
@@ -175,4 +180,19 @@ lib/cglm/include/cglm/curve.h:
 lib/cglm/include/cglm/bezier.h:
 lib/cglm/include/cglm/ray.h:
 lib/cglm/include/cglm/affine2d.h:
+src/defs.h:
+src/util/types.h:
+src/util/macros.h:
+src/config.h:
+src/editor/editor.h:
+src/editor/../defs.h:
+src/objects/object.h:
+src/objects/../defs.h:
 src/objects/triangle.h:
+src/objects/cube.h:
+src/imgui.h:
+lib/cimgui/cimgui.h:
+src/editor/../state.h:
+src/editor/../objects/object.h:
+src/editor/../objects/triangle.h:
+src/editor/../objects/cube.h:

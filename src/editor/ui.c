@@ -1,64 +1,82 @@
-#include "editor/ui.h"
+#include "ui.h"
 #include "imgui.h"
+#include "../state.h"
+#include "../objects/object.h"
+#include "../objects/triangle.h"
+#include "../objects/cube.h"
 #include <cglm/cglm.h>
 #include <stdio.h>
 
-void draw_ui_debug(state_t* state) {
-	ImGuiIO* io = igGetIO();
+void draw_ui_debug(state_t *state) {
+	if (!state->show_debug_menu) return;
 
-	if (state->show_debug_menu) {
+	igBegin("Debug Menu", &state->show_debug_menu, ImGuiWindowFlags_None);
 
-		ImVec2 status_window_pos;
-
-		float status_window_width = 300.0f;
-		float padding = 10.0f;
-		status_window_pos.x = (float)state->WIDTH - status_window_width - padding;
-		status_window_pos.y = padding;
-		igSetNextWindowPos(status_window_pos, ImGuiCond_Always, (ImVec2){0, 0});
-
-		igBegin("STATUS", &state->show_debug_menu, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
-
-		igText("FILE");
-		igText("%s", state->editor->levelpath);
-
-		igSeparator();
-
-		igText("FPS: %.2f", io->Framerate);
-
-		igText("Window Size: %d x %d", state->WIDTH, state->HEIGHT);
-
-		igText("CURSOR: (%.0f, %.0f)", io->MousePos.x, io->MousePos.y);
-
-		igText("CAMERA POS");
-		igText("X: %.3f Y: %.3f Z: %.3f", state->cam.pos.x, state->cam.pos.y, state->cam.pos.z);
-
-		igEnd();
+	if (igTreeNode_Str("Editor")) {
+		if (state->editor) {
+			igText("Level: %s", state->editor->levelpath);
+		}
+		igTreePop();
 	}
 
-	if (state->show_object_properties) {
-		igSetNextWindowSize((ImVec2){300, 400}, ImGuiCond_Appearing);
-		igBegin("Object Properties", &state->show_object_properties, ImGuiWindowFlags_None);
+	if (igTreeNode_Str("Camera")) {
+		igText("Position:");
+		igText("X: %.3f Y: %.3f Z: %.3f", 
+			state->cam.pos[0], 
+			state->cam.pos[1], 
+			state->cam.pos[2]);
+		igTreePop();
+	}
 
-		igColorEdit3("Color", state->triangle.color, ImGuiColorEditFlags_None);
+	if (igTreeNode_Str("Objects")) {
+		if (igTreeNode_Str("Triangle")) {
+			// Color
+			igColorEdit3("Color", state->objects.triangle.color, ImGuiColorEditFlags_None);
 
-		for (int i = 0; i < 3; i++) {
-			char label[32];
-			snprintf(label, sizeof(label), "Vertex %d", i + 1);
-			if (igTreeNode_Str(label)) {
-				if (igDragFloat3("Position", state->triangle.vertices[i], 0.01f, -1.0f, 1.0f, "%.2f", ImGuiSliderFlags_None)) {
-					sg_update_buffer(state->gfx.vbuf, &(sg_range){.ptr = state->triangle.vertices, .size = sizeof(state->triangle.vertices)}); // Update the whole buffer
+			// Vertices
+			if (igTreeNode_Str("Vertices")) {
+				for (int i = 0; i < 3; i++) {
+					char label[32];
+					snprintf(label, sizeof(label), "Vertex %d", i);
+					if (igDragFloat3(label, &state->objects.triangle.vertices[i * 3], 0.01f, -1.0f, 1.0f, "%.2f", ImGuiSliderFlags_None)) {
+						sg_update_buffer(state->gfx.triangle_vbuf, &(sg_range){
+							.ptr = state->objects.triangle.vertices,
+							.size = sizeof(state->objects.triangle.vertices)
+						});
+					}
 				}
 				igTreePop();
 			}
+
+			// Rotation
+			float rotation_deg = glm_deg(state->objects.triangle.rotation);
+			if (igSliderFloat("Rotation", &rotation_deg, 0.0f, 360.0f, "%.1f", ImGuiSliderFlags_None)) {
+				state->objects.triangle.rotation = glm_rad(rotation_deg);
+			}
+
+			// Scale
+			igSliderFloat("Scale", &state->objects.triangle.scale, 0.1f, 2.0f, "%.2f", ImGuiSliderFlags_None);
+
+			igTreePop();
 		}
 
-		float rotation_deg = glm_deg(state->triangle.rotation);
-		if (igSliderFloat("Rotation", &rotation_deg, 0.0f, 360.0f, "%.1f deg", ImGuiSliderFlags_None)) {
-			state->triangle.rotation = glm_rad(rotation_deg);
+		if (igTreeNode_Str("Cube")) {
+			// Color
+			igColorEdit3("Color", state->objects.cube.color, ImGuiColorEditFlags_None);
+
+			// Rotation
+			if (igDragFloat3("Rotation", state->objects.cube.rotation, 0.1f, 0.0f, 360.0f, "%.1f", ImGuiSliderFlags_None)) {
+				// Update is handled in cube_update
+			}
+
+			// Scale
+			igSliderFloat("Scale", &state->objects.cube.scale, 0.1f, 2.0f, "%.2f", ImGuiSliderFlags_None);
+
+			igTreePop();
 		}
 
-		igSliderFloat("Scale", &state->triangle.scale, 0.1f, 2.0f, "%.2f", ImGuiSliderFlags_None);
-
-		igEnd();
+		igTreePop();
 	}
+
+	igEnd();
 } 

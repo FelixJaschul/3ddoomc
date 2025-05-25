@@ -10,6 +10,8 @@
         "types.h": "c",
         "math.h": "c",
         "imgui.h": "c",
-        "ui.h": "c"
+        "ui.h": "c",
+        "cglm.h": "c",
+        "macros.h": "c"
     }
 }

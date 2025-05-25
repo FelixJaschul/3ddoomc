@@ -1,39 +1,71 @@
 #pragma once
 
-#include "sdl2.h"
-#include "imgui.h"
-#include "gfx/gfx.h"
+#include <SDL.h>
+#define SOKOL_IMGUI_NO_SOKOL_APP
+#include <sokol_gfx.h>
+#include <sokol_gp.h>
+#include <util/sokol_gfx_imgui.h>
+#include <util/sokol_gl.h>
+#include <util/sokol_imgui.h>
 #include <cglm/cglm.h>
-#include "objects/triangle.h"
+#include "defs.h"
+#include "editor/editor.h"
+#include "objects/object.h"
 
-typedef struct ImGuiContext ImGuiContext;
+// Forward declarations
+typedef struct camera camera_t;
+typedef struct light light_t;
 
-typedef struct {
-	SDL_Window* window;
+typedef struct state {
+	// Window and context
+	SDL_Window *window;
 	SDL_GLContext gl_ctx;
-	ImGuiContext* imgui_ctx;
-
-	int WIDTH, HEIGHT;
-
+	int WIDTH;
+	int HEIGHT;
 	bool quit;
-	float color[3];
 
-	// sokol-gfx resources
-	gfx_resources_t gfx;
+	// Sokol states
 	void *sg_state;
 	void *sgp_state;
 	void *simgui_state;
 
-	// object state
-	triangle_t triangle;
-	bool show_debug_menu;
-	bool show_object_properties;
+	// ImGui context
+	void *imgui_ctx;
 
-	// matrices for rendering
+	// Editor state
+	editor_t *editor;
+
+	// Camera
+	struct {
+		vec3 pos;
+		vec3 target;
+		vec3 up;
+	} cam;
+
+	// Graphics resources
+	struct {
+		sg_buffer triangle_vbuf;  // Vertex buffer for triangle
+		sg_buffer cube_vbuf;      // Vertex buffer for cube
+		sg_shader shd;
+		sg_pipeline pip;
+	} gfx;
+
+	// Matrices
 	mat4 model_matrix;
 	mat4 view_matrix;
 	mat4 projection_matrix;
 
+	// UI state
+	bool show_debug_menu;
+	bool show_object_properties;
+
+	// Objects
+	struct {
+		triangle_t triangle;
+		cube_t cube;
+	} objects;
+
 } state_t;
 
-extern state_t* state;
+// Global state
+extern state_t *state;

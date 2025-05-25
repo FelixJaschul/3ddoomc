@@ -23,26 +23,46 @@
 #include "shaders/shader.h"
 #include "state.h"
 #include "config.h"
+#include "objects/object.h"
 #include "objects/triangle.h"
+#include "objects/cube.h"
 #include "editor/ui.h"
 
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl3.h>
 
+// Forward declarations
+static bool init(void);
+static void deinit(void);
+
 static void slog_func(const char* tag, uint32_t log_level, uint32_t log_item, const char* message, uint32_t line_nr, const char* filename, void* user_data) {
 	fprintf(stderr, "[%s] %s\n", tag, message);
 }
 
-static bool init() {
+static bool init(void) {
 	state = calloc(1, sizeof(state_t));
 
 	if (!state) {
-		fprintf(stderr, "Failed to allocate state\n"); goto failed;
+		fprintf(stderr, "Failed to allocate state\n"); 
+		return false;
 	}
 
+	// Initialize editor
+	state->editor = calloc(1, sizeof(editor_t));
+	if (!state->editor) {
+		fprintf(stderr, "Failed to allocate editor\n");
+		return false;
+	}
+	strncpy(state->editor->levelpath, "untitled", sizeof(state->editor->levelpath) - 1);
+	state->editor->is_active = true;
+	state->editor->show_grid = true;
+	state->editor->show_axes = true;
+	state->editor->show_bounds = true;
+
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError()); goto failed;
+		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError()); 
+		return false;
 	}
 
 	// openGL 3.3
@@ -55,7 +75,7 @@ static bool init() {
 
 	state->window =
 		SDL_CreateWindow(
-				"TEST",
+				"3D Editor",
 				SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED,
 				1250, 720,
@@ -63,16 +83,19 @@ static bool init() {
 				SDL_WINDOW_RESIZABLE);
 
 	if (!state->window) {
-		fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError()); goto failed;
+		fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError()); 
+		return false;
 	}
 
 	state->gl_ctx = SDL_GL_CreateContext(state->window);
 	if (!state->gl_ctx) {
-		fprintf(stderr, "SDL_GL_CreateContext failed: %s\n", SDL_GetError()); goto failed;
+		fprintf(stderr, "SDL_GL_CreateContext failed: %s\n", SDL_GetError()); 
+		return false;
 	}
 
 	if (SDL_GL_MakeCurrent(state->window, state->gl_ctx) != 0) {
-		fprintf(stderr, "SDL_GL_MakeCurrent failed: %s\n", SDL_GetError()); goto failed;
+		fprintf(stderr, "SDL_GL_MakeCurrent failed: %s\n", SDL_GetError()); 
+		return false;
 	}
 
 	// create and set sokol-gfx state
@@ -128,17 +151,31 @@ static bool init() {
 	};
 	simgui_setup(&simgui_desc);
 
-	// state view
-	state->color[0] = 1.0f;
-	state->color[1] = 0.0f;
-	state->color[2] = 0.0f;
+	// Initialize object system
+	register_object_types();
+
+	// Create triangle object
+	object_t triangle_obj;
+	object_init(&triangle_obj, OT_TRIANGLE);
+	state->objects.triangle = triangle_obj.data.triangle;
+
+	// Create cube object
+	object_t cube_obj;
+	object_init(&cube_obj, OT_CUBE);
+	state->objects.cube = cube_obj.data.cube;
 
 	// sokol-gfx resources
-	sg_buffer_desc vbuf_desc = {
-		.size = sizeof(float) * 3 * 3, // size of 3 vec3 vertices
-		.usage = SG_USAGE_DYNAMIC // usage is dynamic
+	sg_buffer_desc triangle_vbuf_desc = {
+		.size = sizeof(float) * 9,  // 3 vertices * 3 coordinates
+		.usage = SG_USAGE_DYNAMIC
 	};
-	state->gfx.vbuf = sg_make_buffer(&vbuf_desc);
+	state->gfx.triangle_vbuf = sg_make_buffer(&triangle_vbuf_desc);
+
+	sg_buffer_desc cube_vbuf_desc = {
+		.size = sizeof(float) * 108,  // 36 vertices * 3 coordinates
+		.usage = SG_USAGE_DYNAMIC
+	};
+	state->gfx.cube_vbuf = sg_make_buffer(&cube_vbuf_desc);
 
 	sg_shader_desc shd_desc = {
 		.vs = {
@@ -172,9 +209,6 @@ static bool init() {
 	};
 	state->gfx.pip = sg_make_pipeline(&pip_desc);
 
-	// triangle
-	init_triangle(&state->triangle);
-	
 	state->show_debug_menu = true;
 	state->show_object_properties = false;
 
@@ -184,16 +218,14 @@ static bool init() {
 	state->quit = false;
 
 	return true;
-
-failed:
-	return false;
 }
 
-static void deinit() {
+static void deinit(void) {
 	if (!state) return;
 
 	// cleanup
-	sg_destroy_buffer(state->gfx.vbuf);
+	sg_destroy_buffer(state->gfx.triangle_vbuf);
+	sg_destroy_buffer(state->gfx.cube_vbuf);
 	sg_destroy_shader(state->gfx.shd);
 	sg_destroy_pipeline(state->gfx.pip);
 
@@ -212,7 +244,7 @@ static void deinit() {
 	state = NULL;
 }
 
-int main() {
+int main(void) {
 	if (!init()) {
 		return -1;
 	}
@@ -232,21 +264,21 @@ int main() {
 				if (event.key.keysym.sym == SDLK_ESCAPE) {
 					state->quit = true;
 				}
-				break; // done by imgui
+				break;
 
 			case SDL_KEYUP:
-				break; // done by imgui
+				break;
 
 			case SDL_MOUSEMOTION:
-				break; // done by imgui
+				break;
 
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button >= 0 && event.button.button < 3) {
 					igGetIO()->MouseDown[event.button.button] = true;
-				} // done by imgui
+				}
 				
 				if (igGetIO()->WantCaptureMouse) {
-					 // done by imgui
+					// done by imgui
 				} else {
 					if (event.button.button == SDL_BUTTON_RIGHT) {
 						state->show_object_properties = !state->show_object_properties;
@@ -258,10 +290,10 @@ int main() {
 				if (event.button.button >= 0 && event.button.button < 3) {
 					igGetIO()->MouseDown[event.button.button] = false;
 				}
-				break; // done by imgui
+				break;
 
 			case SDL_MOUSEWHEEL:
-				break; // done by imgui
+				break;
 
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
@@ -270,7 +302,7 @@ int main() {
 					state->WIDTH = width;
 					state->HEIGHT = height;
 				}
-				break; // done by imgui
+				break;
 
 			default: break;
 			}
@@ -292,14 +324,7 @@ int main() {
 
 		sg_begin_default_pass(&pass_action, state->WIDTH, state->HEIGHT);
 		
-		mat4 identity = GLM_MAT4_IDENTITY_INIT;
-
-		glm_mat4_copy(identity, state->model_matrix);
-
-		glm_rotate(state->model_matrix, state->triangle.rotation, (vec3){0.0f, 0.0f, 1.0f}); // Rotate around Z axis
-
-		glm_scale(state->model_matrix, (vec3){state->triangle.scale, state->triangle.scale, state->triangle.scale});
-
+		// Update camera
 		vec3 camera_pos = {0.0f, 0.0f, 2.0f};
 		vec3 camera_target = {0.0f, 0.0f, 0.0f};
 		vec3 camera_up = {0.0f, 1.0f, 0.0f};
@@ -308,32 +333,50 @@ int main() {
 		float aspect_ratio = (float)state->WIDTH / (float)state->HEIGHT;
 		glm_perspective(glm_rad(45.0f), aspect_ratio, 0.1f, 100.0f, state->projection_matrix);
 
-		sg_update_buffer(state->gfx.vbuf, &(sg_range){.ptr = state->triangle.vertices, .size = sizeof(state->triangle.vertices)});
-
+		// Apply pipeline
 		sg_apply_pipeline(state->gfx.pip);
-		sg_apply_bindings(&(sg_bindings){
-			.vertex_buffers[0] = state->gfx.vbuf
-		});
 
-		struct {
-			vec3 color;
-			float _pad1;
-			mat4 model;
-			mat4 view;
-			mat4 projection;
-		} vs_uniforms;
-
-		glm_vec3_copy(state->triangle.color, vs_uniforms.color);
-		glm_mat4_copy(state->model_matrix, vs_uniforms.model);
-		glm_mat4_copy(state->view_matrix, vs_uniforms.view);
-		glm_mat4_copy(state->projection_matrix, vs_uniforms.projection);
-
-		sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &(sg_range) { 
-			.ptr = &vs_uniforms,
-			.size = sizeof(vs_uniforms)
-		});
-
-		sg_draw(0, 3, 1);
+		// Update and render triangle
+		object_t triangle_obj;
+		triangle_obj.data.triangle = state->objects.triangle;
+		triangle_obj.type = OT_TRIANGLE;
+		triangle_obj.type_info = get_object_type(OT_TRIANGLE);
+		triangle_obj.init = triangle_init;
+		triangle_obj.update = triangle_update;
+		triangle_obj.render = triangle_render;
+		triangle_obj.cleanup = triangle_cleanup;
+		
+		// Copy state from state->objects.triangle
+		glm_vec3_copy(state->objects.triangle.color, triangle_obj.color);
+		// Position triangle slightly to the left
+		vec3 triangle_pos = {-0.5f, 0.0f, 0.0f};
+		object_set_position(&triangle_obj, triangle_pos);
+		
+		object_update(&triangle_obj);
+		object_render(&triangle_obj);
+		
+		// Update and render cube
+		object_t cube_obj;
+		cube_obj.data.cube = state->objects.cube;
+		cube_obj.type = OT_CUBE;
+		cube_obj.type_info = get_object_type(OT_CUBE);
+		cube_obj.init = cube_init;
+		cube_obj.update = cube_update;
+		cube_obj.render = cube_render;
+		cube_obj.cleanup = cube_cleanup;
+		
+		// Copy state from state->objects.cube
+		glm_vec3_copy(state->objects.cube.color, cube_obj.color);
+		// Position cube slightly to the right
+		vec3 cube_pos = {0.5f, 0.0f, 0.0f};
+		object_set_position(&cube_obj, cube_pos);
+		
+		object_update(&cube_obj);
+		object_render(&cube_obj);
+		
+		// Update state with any changes
+		state->objects.triangle = triangle_obj.data.triangle;
+		state->objects.cube = cube_obj.data.cube;
 
 		simgui_render();
 		sg_end_pass();
