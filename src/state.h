@@ -20,16 +20,16 @@ typedef struct {
 
 	// sokol-gfx resources
 	gfx_resources_t gfx;
-	void *sg_state;  // sokol-gfx state
-	void *sgp_state; // sokol-gp state
-	void *simgui_state; // sokol-imgui state
+	void *sg_state;  		// sokol-gfx state
+	void *sgp_state; 		// sokol-gp state
+	void *simgui_state; 	// sokol-imgui state
 
-	// Object state
+	// object state
 	triangle_t triangle;
 	bool show_debug_menu;
 	bool show_object_properties;
 
-	// Matrices for rendering
+	// matrices for rendering
 	mat4 model_matrix;
 	mat4 view_matrix;
 	mat4 projection_matrix;

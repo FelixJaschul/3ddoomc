@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "/Users/felixjaschul/Downloads/3d-code",
+    "command": "/usr/bin/clang -std=c2x -O1 -g -Wall -Wextra -Wpedantic -Wno-gnu -Wno-format-nonliteral -Wno-unused-parameter -fno-omit-frame-pointer -fsanitize=undefined,address,leak -iquotesrc -Ilib/SDL/include -Ilib/SDL_image/include -Ilib/cimgui -Ilib/cimgui/generator/output -Ilib/soloud/include -Ilib/cglm/include -Ilib/sokol -Ilib/sokol_gp -Ilib/glutess -Ilib/glad/include -DGAME_PLATFORM_osx -DGAME_TARGET_osx_arm64 -c src/editor/ui.c -o bin/src/editor/ui.o",
+    "file": "src/editor/ui.c"
+  }
+] 

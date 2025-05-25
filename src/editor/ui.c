@@ -1,7 +1,7 @@
 #include "editor/ui.h"
 #include "imgui.h"
 #include <cglm/cglm.h>
-#include <stdio.h> // For snprintf
+#include <stdio.h>
 
 void draw_ui_debug(state_t* state) {
 	ImGuiIO* io = igGetIO(); // Get IO state once per frame
