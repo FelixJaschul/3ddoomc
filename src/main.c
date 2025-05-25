@@ -1,16 +1,40 @@
-#include "sdl2.h"
-#include <glad/glad.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <cglm/cglm.h>
 
 #include "imgui.h"
+#include "gfx/gfx.h"
 
+#ifdef EMSCRIPTEN
+#   define SOKOL_GLES3
+#else
+#   define SOKOL_GLCORE33
+#endif
+
+#include <sokol_gfx.h>
+#include <sokol_gp.h>
+#include <util/sokol_gfx_imgui.h>
+#include <util/sokol_gl.h>
+
+#define SOKOL_IMGUI_NO_SOKOL_APP
+#include <util/sokol_imgui.h>
+
+#include "sdl2.h"
 #include "shaders/shader.h"
 #include "state.h"
+#include "config.h"
+#include "objects/triangle.h"
+#include "editor/ui.h"
+
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl3.h>
+
+static void slog_func(const char* tag, uint32_t log_level, uint32_t log_item, const char* message, uint32_t line_nr, const char* filename, void* user_data) {
+	fprintf(stderr, "[%s] %s\n", tag, message);
+}
 
 static bool init() {
-	// allocate state on heap
 	state = calloc(1, sizeof(state_t));
 
 	if (!state) {
@@ -21,20 +45,21 @@ static bool init() {
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError()); goto failed;
 	}
 
+	// OpenGL 3.3
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	
 	SDL_GL_SetAttribute(
-			SDL_GL_CONTEXT_PROFILE_MASK, 
+			SDL_GL_CONTEXT_PROFILE_MASK,
 			SDL_GL_CONTEXT_PROFILE_CORE);
 
-	state->window = 
+	state->window =
 		SDL_CreateWindow(
-				"Test", 
+				"TEST",
 				SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED,
 				1250, 720,
-				SDL_WINDOW_OPENGL | 
+				SDL_WINDOW_OPENGL |
 				SDL_WINDOW_RESIZABLE);
 
 	if (!state->window) {
@@ -45,74 +70,117 @@ static bool init() {
 	if (!state->gl_ctx) {
 		fprintf(stderr, "SDL_GL_CreateContext failed: %s\n", SDL_GetError()); goto failed;
 	}
-	
-	// load open gl
-	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-		fprintf(stderr, "Failed to initialize glad\n"); goto failed;
+
+	// Make sure we have a valid OpenGL context
+	if (SDL_GL_MakeCurrent(state->window, state->gl_ctx) != 0) {
+		fprintf(stderr, "SDL_GL_MakeCurrent failed: %s\n", SDL_GetError()); goto failed;
 	}
 
-	// Setup ImGui context
+	// Create and set sokol-gfx state
+	state->sg_state = sg_create_state();
+	sg_set_state(state->sg_state);
+
+	// Initialize sokol-gfx
+	sg_desc desc = {
+		.context = {
+			.color_format = SG_PIXELFORMAT_RGBA8,
+			.depth_format = SG_PIXELFORMAT_DEPTH_STENCIL,
+			.sample_count = 1,
+		},
+		.logger.func = slog_func,
+	};
+	sg_setup(&desc);
+
+	// Create and set sokol-gp state
+	state->sgp_state = sgp_create_state();
+	sgp_set_state(state->sgp_state);
+
+	// Initialize sokol-gp
+	sgp_desc sgp_desc = {
+		.max_vertices = 64 * 1024,
+		.max_commands = 16 * 1024,
+	};
+	sgp_setup(&sgp_desc);
+
+	// Initialize ImGui
 	state->imgui_ctx = igCreateContext(NULL);
 	ImGuiIO* io = igGetIO();
-	
-	// Set initial display size
-	int width, height;
-	SDL_GetWindowSize(state->window, &width, &height);
-	io->DisplaySize.x = (float)width;
-	io->DisplaySize.y = (float)height;
+	io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-	// Initialize ImGui style
+	state->WIDTH = DEFAULT_WIDTH;
+	state->HEIGHT = DEFAULT_HEIGHT;
+
+	// set initial display size
+	SDL_GetWindowSize(state->window, &state->WIDTH, &state->HEIGHT);
+	io->DisplaySize.x = (float)state->WIDTH;
+	io->DisplaySize.y = (float)state->HEIGHT;
+
 	ImGuiStyle* style = igGetStyle();
 	igStyleColorsDark(style);
 
-	// Initialize font atlas
-	unsigned char* pixels;
-	int font_width, font_height;
-	ImFontAtlas* fonts = io->Fonts;
-	ImFontAtlas_GetTexDataAsRGBA32(fonts, &pixels, &font_width, &font_height, NULL);
+	// Create and set sokol-imgui state
+	state->simgui_state = simgui_create_state();
+	simgui_set_state(state->simgui_state);
 
-	// Create OpenGL texture for font atlas
-	GLuint font_texture;
-	glGenTextures(1, &font_texture);
-	glBindTexture(GL_TEXTURE_2D, font_texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, font_width, font_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-	ImFontAtlas_SetTexID(fonts, (void*)(intptr_t)font_texture);
+	// Initialize sokol-imgui
+	simgui_desc_t simgui_desc = {
+		.max_vertices = 32 * 1024,
+	};
+	simgui_setup(&simgui_desc);
 
 	// state view
 	state->color[0] = 1.0f;
 	state->color[1] = 0.0f;
 	state->color[2] = 0.0f;
 
-	// prepare triangle vertex data 
-	float vertices[] = {
-		0.0f,  0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f
+	// Create sokol-gfx resources
+	sg_buffer_desc vbuf_desc = {
+		.size = sizeof(float) * 3 * 3, // Size of 3 vec3 vertices
+		.usage = SG_USAGE_DYNAMIC // Usage is dynamic
 	};
+	state->gfx.vbuf = sg_make_buffer(&vbuf_desc);
 
-	glGenVertexArrays(1, &state->vao);
-	glGenBuffers(1, &state->vbo);
+	sg_shader_desc shd_desc = {
+		.vs = {
+			.source = shader_load_file("src/shaders/triangle.vert"),
+			.uniform_blocks = { // Declare uniform blocks
+				[0] = { // Uniform block for color, model, view, projection
+					.size = sizeof(vec4) + sizeof(mat4) * 3, // Size for 1 vec4 (padded vec3) + 3 mat4s
+					.layout = SG_UNIFORMLAYOUT_STD140,
+					.uniforms = {
+						[0] = { .name = "color", .type = SG_UNIFORMTYPE_FLOAT3 }, // vec3 aligns to vec4 in std140
+						[1] = { .name = "model", .type = SG_UNIFORMTYPE_MAT4 },
+						[2] = { .name = "view", .type = SG_UNIFORMTYPE_MAT4 },
+						[3] = { .name = "projection", .type = SG_UNIFORMTYPE_MAT4 }
+					}
+				}
+			}
+		},
+		.fs = {
+			.source = shader_load_file("src/shaders/triangle.frag")
+		}
+	};
+	state->gfx.shd = sg_make_shader(&shd_desc);
 
-	glBindVertexArray(state->vao);
-	glBindBuffer(GL_ARRAY_BUFFER, state->vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	sg_pipeline_desc pip_desc = {
+		.shader = state->gfx.shd,
+		.layout = {
+			.attrs = {
+				[0] = { .format = SG_VERTEXFORMAT_FLOAT3 }
+			}
+		}
+	};
+	state->gfx.pip = sg_make_pipeline(&pip_desc);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// Initialize triangle using the new function
+	init_triangle(&state->triangle);
+	
+	state->show_debug_menu = true;
+	state->show_object_properties = false;
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	// load shader
-	state->shader_program = shader_load_program(
-			"src/shaders/triangle.vert", 
-			"src/shaders/triangle.frag");
-
-	if (!state->shader_program) {
-		fprintf(stderr, "Failed to load shader program\n"); goto failed;
- 	}
+	// Initialize model matrix to identity
+	glm_mat4_identity(state->model_matrix);
 
 	state->quit = false;
 
@@ -125,16 +193,23 @@ failed:
 static void deinit() {
 	if (!state) return;
 
-	glDeleteBuffers(1, &state->vbo);
-	glDeleteVertexArrays(1, &state->vao);
-	glDeleteProgram(state->shader_program);
+	// Destroy sokol-gfx resources first
+	sg_destroy_buffer(state->gfx.vbuf);
+	sg_destroy_shader(state->gfx.shd);
+	sg_destroy_pipeline(state->gfx.pip);
 
-	igDestroyContext(state->imgui_ctx);
+	// Shutdown sokol systems in reverse order of initialization
+	// Note: simgui_shutdown() will destroy the ImGui context
+	simgui_shutdown();
+	sgp_shutdown();
+	sg_shutdown();
 
+	// Clean up SDL
 	SDL_GL_DeleteContext(state->gl_ctx);
 	SDL_DestroyWindow(state->window);
 	SDL_Quit();
 
+	// Free state last
 	free(state);
 	state = NULL;
 }
@@ -147,9 +222,11 @@ int main() {
 	while (!state->quit) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
-		if (!imgui_impl_process_sdl_event(&event)) {
+			// Pass all events to ImGui first
+			imgui_impl_process_sdl_event(&event);
+
 			switch (event.type) {
-			case SDL_QUIT: 
+			case SDL_QUIT:
 				state->quit = true;
 				break;
 
@@ -157,57 +234,136 @@ int main() {
 				if (event.key.keysym.sym == SDLK_ESCAPE) {
 					state->quit = true;
 				}
+				break; // ImGui event handling is done by imgui_impl_process_sdl_event
+
+			case SDL_KEYUP:
+				break; // ImGui event handling is done by imgui_impl_process_sdl_event
+
+			case SDL_MOUSEMOTION:
+				break; // ImGui event handling is done by imgui_impl_process_sdl_event
+
+			case SDL_MOUSEBUTTONDOWN:
+				if (event.button.button >= 0 && event.button.button < 3) {
+					igGetIO()->MouseDown[event.button.button] = true;
+				}
+				
+				if (igGetIO()->WantCaptureMouse) {
+					// ImGui is using the mouse, don't process for game objects
+				} else {
+					// Simplified mouse handling - no 3D picking for now
+					// ImVec2 mouse_click_pos = { (float)event.button.x, (float)event.button.y };
+					// bool hit_triangle = false;
+					// ... removed 3D to 2D projection and hit test ...
+
+					// For now, right-click anywhere outside ImGui toggles object properties popup for the triangle
+					if (event.button.button == SDL_BUTTON_RIGHT) {
+						state->show_object_properties = !state->show_object_properties; // Toggle popup
+					}
+				} // Middle mouse button is handled by imgui_impl_process_sdl_event
 				break;
+
+			case SDL_MOUSEBUTTONUP:
+				if (event.button.button >= 0 && event.button.button < 3) {
+					igGetIO()->MouseDown[event.button.button] = false;
+				}
+				break; // ImGui event handling is done by imgui_impl_process_sdl_event
+
+			case SDL_MOUSEWHEEL:
+				break; // ImGui event handling is done by imgui_impl_process_sdl_event
 
 			case SDL_WINDOWEVENT:
 				if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 					int width, height;
 					SDL_GetWindowSize(state->window, &width, &height);
-					glViewport(0, 0, width, height);
+					state->WIDTH = width;
+					state->HEIGHT = height;
 				}
-				break;
+				break; // ImGui event handling is done by imgui_impl_process_sdl_event for WindowEvent_Size_Changed
+
+			default: break;
 			}
 		}
-		}
 
-		igNewFrame();
+		simgui_new_frame(&(simgui_frame_desc_t){
+			.width = state->WIDTH,
+			.height = state->HEIGHT,
+			.delta_time = 1.0f / 60.0f,
+			.dpi_scale = 1.0f
+		});
 
-		// imGui window
-		{
-			igSetNextWindowPos((ImVec2){800 - 220, 10}, ImGuiCond_Always, (ImVec2){0, 0});
-			igSetNextWindowSize((ImVec2){210, 110}, ImGuiCond_Always);
+		// Draw all debug UI windows
+		draw_ui_debug(state);
 
-			igBegin("Triangle Color", 
-				NULL, ImGuiWindowFlags_NoResize | 
-				ImGuiWindowFlags_NoCollapse | 
-				ImGuiWindowFlags_NoMove);
+		// Render frame
+		sg_pass_action pass_action = {
+			.colors[0] = { .action = SG_ACTION_CLEAR, .value = { 0.2f, 0.25f, 0.3f, 1.0f } }
+		};
 
-			igColorEdit3("Color", state->color, ImGuiColorEditFlags_None);
+		sg_begin_default_pass(&pass_action, state->WIDTH, state->HEIGHT);
+		
+		// Calculate Model, View, Projection matrices
+		mat4 identity = GLM_MAT4_IDENTITY_INIT;
 
-			igEnd();
-		}
+		// Model matrix (translate, rotate, scale the triangle)
+		glm_mat4_copy(identity, state->model_matrix);
+		// For simplicity, let's assume triangle's origin is at (0,0,0) in world space
+		// If triangle_t had a position, we would translate here: glm_translate(state->model_matrix, state->triangle.position);
 
-		igRender();
+		// Apply rotation from state->triangle.rotation
+		glm_rotate(state->model_matrix, state->triangle.rotation, (vec3){0.0f, 0.0f, 1.0f}); // Rotate around Z axis
 
-		glViewport(0, 0, 800, 600);
-		glClearColor(0.2f, 0.25f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		// Apply scale from state->triangle.scale
+		glm_scale(state->model_matrix, (vec3){state->triangle.scale, state->triangle.scale, state->triangle.scale});
 
-		// render triangle
-		glUseProgram(state->shader_program);
+		// View matrix (camera)
+		// For a simple setup, let's position the camera looking towards the origin
+		vec3 camera_pos = {0.0f, 0.0f, 2.0f}; // Camera position
+		vec3 camera_target = {0.0f, 0.0f, 0.0f}; // Point camera is looking at
+		vec3 camera_up = {0.0f, 1.0f, 0.0f}; // Up direction
+		glm_lookat(camera_pos, camera_target, camera_up, state->view_matrix);
 
-		// set uniform for color
-		GLint color_loc = glGetUniformLocation(state->shader_program, "uColor");
-		glUniform3fv(color_loc, 1, state->color);
+		// Projection matrix
+		float aspect_ratio = (float)state->WIDTH / (float)state->HEIGHT;
+		glm_perspective(glm_rad(45.0f), aspect_ratio, 0.1f, 100.0f, state->projection_matrix); // 45 degree FOV, aspect ratio, near/far plane
 
-		glBindVertexArray(state->vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
+		// Update vertex buffer with current triangle data
+		sg_update_buffer(state->gfx.vbuf, &(sg_range){.ptr = state->triangle.vertices, .size = sizeof(state->triangle.vertices)});
+
+		// Draw triangle
+		sg_apply_pipeline(state->gfx.pip);
+		sg_apply_bindings(&(sg_bindings){
+			.vertex_buffers[0] = state->gfx.vbuf
+		});
+		// Apply uniforms
+		// Apply all uniforms in one block at slot 0
+		struct { // C struct matching the uniform block layout
+			vec3 color;
+			float _pad1; // Padding to align vec3 to vec4
+			mat4 model;
+			mat4 view;
+			mat4 projection;
+		} vs_uniforms;
+
+		glm_vec3_copy(state->triangle.color, vs_uniforms.color);
+		glm_mat4_copy(state->model_matrix, vs_uniforms.model);
+		glm_mat4_copy(state->view_matrix, vs_uniforms.view);
+		glm_mat4_copy(state->projection_matrix, vs_uniforms.projection);
+
+		sg_apply_uniforms(SG_SHADERSTAGE_VS, 0, &(sg_range){ // Apply the entire struct as the uniform block
+			.ptr = &vs_uniforms,
+			.size = sizeof(vs_uniforms)
+		});
+
+		sg_draw(0, 3, 1);
+
+		simgui_render();
+		sg_end_pass();
+		sg_commit();
 
 		SDL_GL_SwapWindow(state->window);
-    }
+	}
 
-    deinit();
+	deinit();
 
-    return 0;
+	return 0;
 }

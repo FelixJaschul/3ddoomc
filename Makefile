@@ -159,6 +159,7 @@ dirs: $(BIN) FORCE
 	$(shell mkdir -p $(BIN)/lib)
 	$(shell mkdir -p $(BIN)/lib/glutess)
 	$(shell mkdir -p $(BIN)/lib/glad/src)
+	$(shell mkdir -p $(BIN)/lib/sokol/util)
 	rsync -a --include '*/' --exclude '*' "src" "bin"
 
 lib-sdl:

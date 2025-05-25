@@ -1,10 +1,7 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
-#include <glad/glad.h>
+#include "gfx/gfx.h"
 
-// Load and compile a vertex + fragment shader and link them into a program.
-GLuint shader_load_program(const char* vertex_path, const char* fragment_path);
-
-#endif
+// Load shader source code from file
+char* shader_load_file(const char* path);
 

@@ -1,0 +1,12 @@
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/sdl_headers_copy.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/SDL2main.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/SDL2.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/SDL2-static.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/SDL2_test.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/uninstall.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/edit_cache.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/rebuild_cache.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/list_install_components.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/install.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/install/local.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl/CMakeFiles/install/strip.dir

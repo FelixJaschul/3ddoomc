@@ -1,0 +1,7 @@
+/Users/felixjaschul/Downloads/3d-code/bin/cimgui/CMakeFiles/cimgui.dir
+/Users/felixjaschul/Downloads/3d-code/bin/cimgui/CMakeFiles/edit_cache.dir
+/Users/felixjaschul/Downloads/3d-code/bin/cimgui/CMakeFiles/rebuild_cache.dir
+/Users/felixjaschul/Downloads/3d-code/bin/cimgui/CMakeFiles/list_install_components.dir
+/Users/felixjaschul/Downloads/3d-code/bin/cimgui/CMakeFiles/install.dir
+/Users/felixjaschul/Downloads/3d-code/bin/cimgui/CMakeFiles/install/local.dir
+/Users/felixjaschul/Downloads/3d-code/bin/cimgui/CMakeFiles/install/strip.dir

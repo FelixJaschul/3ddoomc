@@ -1,0 +1,9 @@
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/SDL2_image.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/showanim.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/showimage.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/edit_cache.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/rebuild_cache.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/list_install_components.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/install.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/install/local.dir
+/Users/felixjaschul/Downloads/3d-code/bin/sdl-image/CMakeFiles/install/strip.dir

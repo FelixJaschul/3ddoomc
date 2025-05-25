@@ -1,0 +1,1 @@
+/usr/bin/cc  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/showanim.dir/examples/showanim.c.o -o showanim -F/Library/Developer/CommandLineTools/Library/Frameworks  libSDL2_image.a -framework SDL2 -Wl,-framework,ApplicationServices -lobjc

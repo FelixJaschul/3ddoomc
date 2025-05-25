@@ -4,6 +4,11 @@
         "config.h": "c",
         "level.h": "c",
         "reload.h": "c",
-        "state.h": "c"
+        "state.h": "c",
+        "sokol_gfx.h": "c",
+        "aabb.h": "c",
+        "types.h": "c",
+        "math.h": "c",
+        "imgui.h": "c"
     }
 }
