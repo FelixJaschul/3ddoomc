@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../old/util/macros.h"
-#include "../old/util/types.h"
-#include "../old/util/math.h"
+#include "util/macros.h"
+#include "util/types.h"
+#include "util/math.h"
 
 #define AABB_TO_F(_a)                                                      \
     ({ TYPEOF(_a) __a = (_a);                                           \

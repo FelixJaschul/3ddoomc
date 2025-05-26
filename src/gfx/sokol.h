@@ -6,7 +6,7 @@
 #   define SOKOL_GLES3
 #else
 #   define SOKOL_GLCORE33
-#endif
+#endif // ifdef EMSCRIPTEN
 
 #include <sokol_gfx.h>
 #include <sokol_gp.h>
@@ -14,7 +14,7 @@
 #include <util/sokol_gfx_imgui.h>
 #include "gfx/sokol_gfx_ext.h"
 
-#endif
+#endif // ifdef SOKOL_GFX_INCLUDED
 
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>

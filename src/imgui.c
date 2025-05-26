@@ -11,7 +11,7 @@ static struct {
     int             PendingMouseLeaveFrame;
     char*           ClipboardTextData;
     bool            MouseCanUseGlobalState;
-    bool            MouseCanReportHoveredViewport;
+    bool            MouseCanReportHoveredViewport;  // This is hard to use/unreliable on SDL so we'll set ImGuiBackendFlags_HasMouseHoveredViewport dynamically based on state.
     bool            UseVulkan;
 } bd;
 
@@ -139,6 +139,7 @@ static ImGuiKey keycode_to_imgui_key(int keycode)
 
 bool imgui_impl_process_sdl_event(const SDL_Event *event) {
     ImGuiIO *io = igGetIO();
+    /* ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData(); */
 
     switch (event->type)
     {
@@ -188,17 +189,41 @@ bool imgui_impl_process_sdl_event(const SDL_Event *event) {
             update_key_modifiers((SDL_Keymod)event->key.keysym.mod);
             ImGuiKey key = keycode_to_imgui_key(event->key.keysym.sym);
             ImGuiIO_AddKeyEvent(io, key, event->type == SDL_KEYDOWN);
-            ImGuiIO_SetKeyEventNativeData(io, key, event->key.keysym.sym, event->key.keysym.scancode, event->key.keysym.scancode);
+            ImGuiIO_SetKeyEventNativeData(io, key, event->key.keysym.sym, event->key.keysym.scancode, event->key.keysym.scancode); // To support legacy indexing (<1.87 user code). Legacy backend uses SDLK_*** as indices to IsKeyXXX(io, ) functions.
             return true;
         }
         case SDL_WINDOWEVENT:
         {
-            if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+            // - When capturing mouse, SDL will send a bunch of conflicting LEAVE/ENTER event on every mouse move, but the final ENTER tends to be right.
+            // - However we won't get a correct LEAVE event for a captured window.
+            // - In some cases, when detaching a window from main viewport SDL may send SDL_WINDOWEVENT_ENTER one frame too late,
+            //   causing SDL_WINDOWEVENT_LEAVE on previous frame to interrupt drag operation by clear mouse position. This is why
+            //   we delay process the SDL_WINDOWEVENT_LEAVE events by one frame. See issue #5012 for details.
+            Uint8 window_event = event->window.event;
+            if (window_event == SDL_WINDOWEVENT_ENTER)
             {
-                int w = event->window.data1;
-                int h = event->window.data2;
-                io->DisplaySize.x = (float)w;
-                io->DisplaySize.y = (float)h;
+                bd.MouseWindowID = event->window.windowID;
+                bd.PendingMouseLeaveFrame = 0;
+            }
+            if (window_event == SDL_WINDOWEVENT_LEAVE)
+                bd.PendingMouseLeaveFrame = igGetFrameCount() + 1;
+            if (window_event == SDL_WINDOWEVENT_FOCUS_GAINED)
+                ImGuiIO_AddFocusEvent(io, true);
+            else if (window_event == SDL_WINDOWEVENT_FOCUS_LOST)
+                ImGuiIO_AddFocusEvent(io, false);
+            if (window_event == SDL_WINDOWEVENT_CLOSE || window_event == SDL_WINDOWEVENT_MOVED || window_event == SDL_WINDOWEVENT_RESIZED) {
+                ImGuiViewport *viewport =
+                    igFindViewportByPlatformHandle((void*) SDL_GetWindowFromID(event->window.windowID));
+                if (viewport)
+                {
+                    if (window_event == SDL_WINDOWEVENT_CLOSE)
+                        viewport->PlatformRequestClose = true;
+                    if (window_event == SDL_WINDOWEVENT_MOVED)
+                        viewport->PlatformRequestMove = true;
+                    if (window_event == SDL_WINDOWEVENT_RESIZED)
+                        viewport->PlatformRequestResize = true;
+                    return true;
+                }
             }
             return true;
         }

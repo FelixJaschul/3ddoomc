@@ -1,4 +1,5 @@
-#include <stdio.h>
+#include "config.h"
+#include "util/aabb.h"
 
 #define SOKOL_IMPL
 #define SOKOL_DEBUG
@@ -8,9 +9,11 @@
 #   define SOKOL_GLES3
 #else
 #   define SOKOL_GLCORE33
-#endif
+#endif // ifdef EMSCRIPTEN
 
-#include "imgui.h"
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include <cimgui.h>
+
 #include <sokol_gfx.h>
 #include <sokol_gp.h>
 #include <util/sokol_gfx_imgui.h>
@@ -21,12 +24,7 @@
 #define SOKOL_IMGUI_NO_SOKOL_APP
 #include <util/sokol_imgui.h>
 
-#include "../old/util/math.h"
-
-struct aabbf {
-    vec2s min;
-    vec2s max;
-};
+#include "util/math.h"
 
 void sgp_draw_thick_line(
     float ax,

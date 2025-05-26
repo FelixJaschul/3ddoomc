@@ -1,4 +1,33 @@
-bin/src/main.o: src/main.c lib/cglm/include/cglm/cglm.h \
+bin/src/main.o: src/main.c lib/soloud/include/soloud_c.h src/util/input.h \
+  src/sdl2.h lib/SDL/include/SDL.h lib/SDL/include/SDL_main.h \
+  lib/SDL/include/SDL_stdinc.h lib/SDL/include/SDL_config.h \
+  lib/SDL/include/SDL_platform.h lib/SDL/include/begin_code.h \
+  lib/SDL/include/close_code.h lib/SDL/include/SDL_config_macosx.h \
+  lib/SDL/include/SDL_assert.h lib/SDL/include/SDL_atomic.h \
+  lib/SDL/include/SDL_audio.h lib/SDL/include/SDL_error.h \
+  lib/SDL/include/SDL_endian.h lib/SDL/include/SDL_mutex.h \
+  lib/SDL/include/SDL_thread.h lib/SDL/include/SDL_rwops.h \
+  lib/SDL/include/SDL_clipboard.h lib/SDL/include/SDL_cpuinfo.h \
+  lib/SDL/include/SDL_events.h lib/SDL/include/SDL_video.h \
+  lib/SDL/include/SDL_pixels.h lib/SDL/include/SDL_rect.h \
+  lib/SDL/include/SDL_surface.h lib/SDL/include/SDL_blendmode.h \
+  lib/SDL/include/SDL_keyboard.h lib/SDL/include/SDL_keycode.h \
+  lib/SDL/include/SDL_scancode.h lib/SDL/include/SDL_mouse.h \
+  lib/SDL/include/SDL_joystick.h lib/SDL/include/SDL_guid.h \
+  lib/SDL/include/SDL_gamecontroller.h lib/SDL/include/SDL_sensor.h \
+  lib/SDL/include/SDL_quit.h lib/SDL/include/SDL_gesture.h \
+  lib/SDL/include/SDL_touch.h lib/SDL/include/SDL_filesystem.h \
+  lib/SDL/include/SDL_haptic.h lib/SDL/include/SDL_hidapi.h \
+  lib/SDL/include/SDL_hints.h lib/SDL/include/SDL_loadso.h \
+  lib/SDL/include/SDL_log.h lib/SDL/include/SDL_messagebox.h \
+  lib/SDL/include/SDL_metal.h lib/SDL/include/SDL_power.h \
+  lib/SDL/include/SDL_render.h lib/SDL/include/SDL_shape.h \
+  lib/SDL/include/SDL_system.h lib/SDL/include/SDL_timer.h \
+  lib/SDL/include/SDL_version.h lib/SDL/include/SDL_locale.h \
+  lib/SDL/include/SDL_misc.h lib/SDL_image/include/SDL_image.h \
+  src/util/macros.h src/util/types.h src/util/dynlist.h src/util/math.h \
+  src/config.h src/util/log.h src/util/util.h \
+  lib/cglm/include/cglm/struct.h lib/cglm/include/cglm/cglm.h \
   lib/cglm/include/cglm/common.h lib/cglm/include/cglm/types.h \
   lib/cglm/include/cglm/simd/intrin.h lib/cglm/include/cglm/simd/arm.h \
   lib/cglm/include/cglm/vec2.h lib/cglm/include/cglm/util.h \
@@ -33,39 +62,142 @@ bin/src/main.o: src/main.c lib/cglm/include/cglm/cglm.h \
   lib/cglm/include/cglm/sphere.h lib/cglm/include/cglm/ease.h \
   lib/cglm/include/cglm/curve.h lib/cglm/include/cglm/bezier.h \
   lib/cglm/include/cglm/ray.h lib/cglm/include/cglm/affine2d.h \
-  src/imgui.h lib/cimgui/cimgui.h src/gfx/gfx.h lib/sokol/sokol_gfx.h \
-  lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gfx_imgui.h \
-  lib/sokol/util/sokol_gl.h lib/sokol/util/sokol_imgui.h src/sdl2.h \
-  lib/SDL/include/SDL.h lib/SDL/include/SDL_main.h \
-  lib/SDL/include/SDL_stdinc.h lib/SDL/include/SDL_config.h \
-  lib/SDL/include/SDL_platform.h lib/SDL/include/begin_code.h \
-  lib/SDL/include/close_code.h lib/SDL/include/SDL_config_macosx.h \
-  lib/SDL/include/SDL_assert.h lib/SDL/include/SDL_atomic.h \
-  lib/SDL/include/SDL_audio.h lib/SDL/include/SDL_error.h \
-  lib/SDL/include/SDL_endian.h lib/SDL/include/SDL_mutex.h \
-  lib/SDL/include/SDL_thread.h lib/SDL/include/SDL_rwops.h \
-  lib/SDL/include/SDL_clipboard.h lib/SDL/include/SDL_cpuinfo.h \
-  lib/SDL/include/SDL_events.h lib/SDL/include/SDL_video.h \
-  lib/SDL/include/SDL_pixels.h lib/SDL/include/SDL_rect.h \
-  lib/SDL/include/SDL_surface.h lib/SDL/include/SDL_blendmode.h \
-  lib/SDL/include/SDL_keyboard.h lib/SDL/include/SDL_keycode.h \
-  lib/SDL/include/SDL_scancode.h lib/SDL/include/SDL_mouse.h \
-  lib/SDL/include/SDL_joystick.h lib/SDL/include/SDL_guid.h \
-  lib/SDL/include/SDL_gamecontroller.h lib/SDL/include/SDL_sensor.h \
-  lib/SDL/include/SDL_quit.h lib/SDL/include/SDL_gesture.h \
-  lib/SDL/include/SDL_touch.h lib/SDL/include/SDL_filesystem.h \
-  lib/SDL/include/SDL_haptic.h lib/SDL/include/SDL_hidapi.h \
-  lib/SDL/include/SDL_hints.h lib/SDL/include/SDL_loadso.h \
-  lib/SDL/include/SDL_log.h lib/SDL/include/SDL_messagebox.h \
-  lib/SDL/include/SDL_metal.h lib/SDL/include/SDL_power.h \
-  lib/SDL/include/SDL_render.h lib/SDL/include/SDL_shape.h \
-  lib/SDL/include/SDL_system.h lib/SDL/include/SDL_timer.h \
-  lib/SDL/include/SDL_version.h lib/SDL/include/SDL_locale.h \
-  lib/SDL/include/SDL_misc.h lib/SDL_image/include/SDL_image.h \
-  src/shaders/shader.h src/state.h src/defs.h src/util/types.h \
-  src/util/macros.h src/config.h src/editor/editor.h \
-  src/editor/../defs.h src/objects/object.h src/objects/../defs.h \
-  src/objects/triangle.h src/objects/cube.h src/editor/ui.h
+  lib/cglm/include/cglm/types-struct.h \
+  lib/cglm/include/cglm/struct/vec2.h \
+  lib/cglm/include/cglm/struct/../common.h \
+  lib/cglm/include/cglm/struct/../types-struct.h \
+  lib/cglm/include/cglm/struct/../util.h \
+  lib/cglm/include/cglm/struct/../vec2.h \
+  lib/cglm/include/cglm/struct/vec2-ext.h \
+  lib/cglm/include/cglm/struct/../vec2-ext.h \
+  lib/cglm/include/cglm/struct/vec3.h \
+  lib/cglm/include/cglm/struct/../vec3.h \
+  lib/cglm/include/cglm/struct/vec3-ext.h \
+  lib/cglm/include/cglm/struct/../vec3-ext.h \
+  lib/cglm/include/cglm/struct/vec4.h \
+  lib/cglm/include/cglm/struct/../vec4.h \
+  lib/cglm/include/cglm/struct/vec4-ext.h \
+  lib/cglm/include/cglm/struct/../vec4-ext.h \
+  lib/cglm/include/cglm/struct/mat2.h \
+  lib/cglm/include/cglm/struct/../mat2.h \
+  lib/cglm/include/cglm/struct/mat3.h \
+  lib/cglm/include/cglm/struct/../mat3.h \
+  lib/cglm/include/cglm/struct/mat4.h \
+  lib/cglm/include/cglm/struct/../mat4.h \
+  lib/cglm/include/cglm/struct/affine.h \
+  lib/cglm/include/cglm/struct/../affine.h \
+  lib/cglm/include/cglm/struct/affine-pre.h \
+  lib/cglm/include/cglm/struct/affine-post.h \
+  lib/cglm/include/cglm/struct/frustum.h \
+  lib/cglm/include/cglm/struct/../frustum.h \
+  lib/cglm/include/cglm/struct/plane.h \
+  lib/cglm/include/cglm/struct/../plane.h \
+  lib/cglm/include/cglm/struct/box.h \
+  lib/cglm/include/cglm/struct/../box.h \
+  lib/cglm/include/cglm/struct/color.h \
+  lib/cglm/include/cglm/struct/../color.h \
+  lib/cglm/include/cglm/struct/io.h lib/cglm/include/cglm/struct/../io.h \
+  lib/cglm/include/cglm/struct/cam.h \
+  lib/cglm/include/cglm/struct/../cam.h \
+  lib/cglm/include/cglm/struct/clipspace/ortho_rh_no.h \
+  lib/cglm/include/cglm/struct/clipspace/../../common.h \
+  lib/cglm/include/cglm/struct/clipspace/../../types-struct.h \
+  lib/cglm/include/cglm/struct/clipspace/../../plane.h \
+  lib/cglm/include/cglm/struct/clipspace/../../cam.h \
+  lib/cglm/include/cglm/struct/clipspace/persp_rh_no.h \
+  lib/cglm/include/cglm/struct/clipspace/view_rh_no.h \
+  lib/cglm/include/cglm/struct/quat.h \
+  lib/cglm/include/cglm/struct/../quat.h \
+  lib/cglm/include/cglm/struct/euler.h \
+  lib/cglm/include/cglm/struct/../euler.h \
+  lib/cglm/include/cglm/struct/project.h \
+  lib/cglm/include/cglm/struct/../project.h \
+  lib/cglm/include/cglm/struct/sphere.h \
+  lib/cglm/include/cglm/struct/../sphere.h \
+  lib/cglm/include/cglm/struct/curve.h \
+  lib/cglm/include/cglm/struct/../curve.h \
+  lib/cglm/include/cglm/struct/affine2d.h \
+  lib/cglm/include/cglm/struct/../affine2d.h src/util/ivec2s.h \
+  src/util/ivec2.h src/util/assert.h src/util/time.h src/util/str.h \
+  src/state.h src/util/aabb.h src/gfx/gfx.h src/gfx/sokol.h \
+  lib/sokol/sokol_gfx.h lib/sokol_gp/sokol_gp.h \
+  lib/sokol/util/sokol_gl.h lib/sokol/util/sokol_gfx_imgui.h \
+  src/gfx/sokol_gfx_ext.h lib/sokol/util/sokol_imgui.h src/util/map.h \
+  src/reload.h src/../util/reloadhost.h src/util/resource.h src/defs.h \
+  src/util/enum.h src/shared_defs.h src/util/rand.h src/util/file.h \
+  src/util/dlist.h src/util/llist.h src/util/bitmap.h src/util/image.h \
+  src/ext/stb_image.h src/util/sound.h src/level/vertex.h \
+  src/level/wall.h src/level/side.h src/level/sector.h \
+  src/level/level_defs.h src/level/sectmat.h src/level/sidemat.h \
+  src/level/tag.h src/level/lptr.h src/level/block.h \
+  src/level/particle.h src/level/path.h src/level/decal.h \
+  src/editor/editor.h src/gfx/renderer_types.h src/imgui.h \
+  lib/cimgui/cimgui.h src/util/color.h src/gfx/opengl.h src/gfx/atlas.h \
+  src/gfx/palette.h src/gfx/renderer.h src/gfx/dynbuf.h \
+  src/level/level.h
+lib/soloud/include/soloud_c.h:
+src/util/input.h:
+src/sdl2.h:
+lib/SDL/include/SDL.h:
+lib/SDL/include/SDL_main.h:
+lib/SDL/include/SDL_stdinc.h:
+lib/SDL/include/SDL_config.h:
+lib/SDL/include/SDL_platform.h:
+lib/SDL/include/begin_code.h:
+lib/SDL/include/close_code.h:
+lib/SDL/include/SDL_config_macosx.h:
+lib/SDL/include/SDL_assert.h:
+lib/SDL/include/SDL_atomic.h:
+lib/SDL/include/SDL_audio.h:
+lib/SDL/include/SDL_error.h:
+lib/SDL/include/SDL_endian.h:
+lib/SDL/include/SDL_mutex.h:
+lib/SDL/include/SDL_thread.h:
+lib/SDL/include/SDL_rwops.h:
+lib/SDL/include/SDL_clipboard.h:
+lib/SDL/include/SDL_cpuinfo.h:
+lib/SDL/include/SDL_events.h:
+lib/SDL/include/SDL_video.h:
+lib/SDL/include/SDL_pixels.h:
+lib/SDL/include/SDL_rect.h:
+lib/SDL/include/SDL_surface.h:
+lib/SDL/include/SDL_blendmode.h:
+lib/SDL/include/SDL_keyboard.h:
+lib/SDL/include/SDL_keycode.h:
+lib/SDL/include/SDL_scancode.h:
+lib/SDL/include/SDL_mouse.h:
+lib/SDL/include/SDL_joystick.h:
+lib/SDL/include/SDL_guid.h:
+lib/SDL/include/SDL_gamecontroller.h:
+lib/SDL/include/SDL_sensor.h:
+lib/SDL/include/SDL_quit.h:
+lib/SDL/include/SDL_gesture.h:
+lib/SDL/include/SDL_touch.h:
+lib/SDL/include/SDL_filesystem.h:
+lib/SDL/include/SDL_haptic.h:
+lib/SDL/include/SDL_hidapi.h:
+lib/SDL/include/SDL_hints.h:
+lib/SDL/include/SDL_loadso.h:
+lib/SDL/include/SDL_log.h:
+lib/SDL/include/SDL_messagebox.h:
+lib/SDL/include/SDL_metal.h:
+lib/SDL/include/SDL_power.h:
+lib/SDL/include/SDL_render.h:
+lib/SDL/include/SDL_shape.h:
+lib/SDL/include/SDL_system.h:
+lib/SDL/include/SDL_timer.h:
+lib/SDL/include/SDL_version.h:
+lib/SDL/include/SDL_locale.h:
+lib/SDL/include/SDL_misc.h:
+lib/SDL_image/include/SDL_image.h:
+src/util/macros.h:
+src/util/types.h:
+src/util/dynlist.h:
+src/util/math.h:
+src/config.h:
+src/util/log.h:
+src/util/util.h:
+lib/cglm/include/cglm/struct.h:
 lib/cglm/include/cglm/cglm.h:
 lib/cglm/include/cglm/common.h:
 lib/cglm/include/cglm/types.h:
@@ -120,77 +252,114 @@ lib/cglm/include/cglm/curve.h:
 lib/cglm/include/cglm/bezier.h:
 lib/cglm/include/cglm/ray.h:
 lib/cglm/include/cglm/affine2d.h:
-src/imgui.h:
-lib/cimgui/cimgui.h:
+lib/cglm/include/cglm/types-struct.h:
+lib/cglm/include/cglm/struct/vec2.h:
+lib/cglm/include/cglm/struct/../common.h:
+lib/cglm/include/cglm/struct/../types-struct.h:
+lib/cglm/include/cglm/struct/../util.h:
+lib/cglm/include/cglm/struct/../vec2.h:
+lib/cglm/include/cglm/struct/vec2-ext.h:
+lib/cglm/include/cglm/struct/../vec2-ext.h:
+lib/cglm/include/cglm/struct/vec3.h:
+lib/cglm/include/cglm/struct/../vec3.h:
+lib/cglm/include/cglm/struct/vec3-ext.h:
+lib/cglm/include/cglm/struct/../vec3-ext.h:
+lib/cglm/include/cglm/struct/vec4.h:
+lib/cglm/include/cglm/struct/../vec4.h:
+lib/cglm/include/cglm/struct/vec4-ext.h:
+lib/cglm/include/cglm/struct/../vec4-ext.h:
+lib/cglm/include/cglm/struct/mat2.h:
+lib/cglm/include/cglm/struct/../mat2.h:
+lib/cglm/include/cglm/struct/mat3.h:
+lib/cglm/include/cglm/struct/../mat3.h:
+lib/cglm/include/cglm/struct/mat4.h:
+lib/cglm/include/cglm/struct/../mat4.h:
+lib/cglm/include/cglm/struct/affine.h:
+lib/cglm/include/cglm/struct/../affine.h:
+lib/cglm/include/cglm/struct/affine-pre.h:
+lib/cglm/include/cglm/struct/affine-post.h:
+lib/cglm/include/cglm/struct/frustum.h:
+lib/cglm/include/cglm/struct/../frustum.h:
+lib/cglm/include/cglm/struct/plane.h:
+lib/cglm/include/cglm/struct/../plane.h:
+lib/cglm/include/cglm/struct/box.h:
+lib/cglm/include/cglm/struct/../box.h:
+lib/cglm/include/cglm/struct/color.h:
+lib/cglm/include/cglm/struct/../color.h:
+lib/cglm/include/cglm/struct/io.h:
+lib/cglm/include/cglm/struct/../io.h:
+lib/cglm/include/cglm/struct/cam.h:
+lib/cglm/include/cglm/struct/../cam.h:
+lib/cglm/include/cglm/struct/clipspace/ortho_rh_no.h:
+lib/cglm/include/cglm/struct/clipspace/../../common.h:
+lib/cglm/include/cglm/struct/clipspace/../../types-struct.h:
+lib/cglm/include/cglm/struct/clipspace/../../plane.h:
+lib/cglm/include/cglm/struct/clipspace/../../cam.h:
+lib/cglm/include/cglm/struct/clipspace/persp_rh_no.h:
+lib/cglm/include/cglm/struct/clipspace/view_rh_no.h:
+lib/cglm/include/cglm/struct/quat.h:
+lib/cglm/include/cglm/struct/../quat.h:
+lib/cglm/include/cglm/struct/euler.h:
+lib/cglm/include/cglm/struct/../euler.h:
+lib/cglm/include/cglm/struct/project.h:
+lib/cglm/include/cglm/struct/../project.h:
+lib/cglm/include/cglm/struct/sphere.h:
+lib/cglm/include/cglm/struct/../sphere.h:
+lib/cglm/include/cglm/struct/curve.h:
+lib/cglm/include/cglm/struct/../curve.h:
+lib/cglm/include/cglm/struct/affine2d.h:
+lib/cglm/include/cglm/struct/../affine2d.h:
+src/util/ivec2s.h:
+src/util/ivec2.h:
+src/util/assert.h:
+src/util/time.h:
+src/util/str.h:
+src/state.h:
+src/util/aabb.h:
 src/gfx/gfx.h:
+src/gfx/sokol.h:
 lib/sokol/sokol_gfx.h:
 lib/sokol_gp/sokol_gp.h:
-lib/sokol/util/sokol_gfx_imgui.h:
 lib/sokol/util/sokol_gl.h:
+lib/sokol/util/sokol_gfx_imgui.h:
+src/gfx/sokol_gfx_ext.h:
 lib/sokol/util/sokol_imgui.h:
-src/sdl2.h:
-lib/SDL/include/SDL.h:
-lib/SDL/include/SDL_main.h:
-lib/SDL/include/SDL_stdinc.h:
-lib/SDL/include/SDL_config.h:
-lib/SDL/include/SDL_platform.h:
-lib/SDL/include/begin_code.h:
-lib/SDL/include/close_code.h:
-lib/SDL/include/SDL_config_macosx.h:
-lib/SDL/include/SDL_assert.h:
-lib/SDL/include/SDL_atomic.h:
-lib/SDL/include/SDL_audio.h:
-lib/SDL/include/SDL_error.h:
-lib/SDL/include/SDL_endian.h:
-lib/SDL/include/SDL_mutex.h:
-lib/SDL/include/SDL_thread.h:
-lib/SDL/include/SDL_rwops.h:
-lib/SDL/include/SDL_clipboard.h:
-lib/SDL/include/SDL_cpuinfo.h:
-lib/SDL/include/SDL_events.h:
-lib/SDL/include/SDL_video.h:
-lib/SDL/include/SDL_pixels.h:
-lib/SDL/include/SDL_rect.h:
-lib/SDL/include/SDL_surface.h:
-lib/SDL/include/SDL_blendmode.h:
-lib/SDL/include/SDL_keyboard.h:
-lib/SDL/include/SDL_keycode.h:
-lib/SDL/include/SDL_scancode.h:
-lib/SDL/include/SDL_mouse.h:
-lib/SDL/include/SDL_joystick.h:
-lib/SDL/include/SDL_guid.h:
-lib/SDL/include/SDL_gamecontroller.h:
-lib/SDL/include/SDL_sensor.h:
-lib/SDL/include/SDL_quit.h:
-lib/SDL/include/SDL_gesture.h:
-lib/SDL/include/SDL_touch.h:
-lib/SDL/include/SDL_filesystem.h:
-lib/SDL/include/SDL_haptic.h:
-lib/SDL/include/SDL_hidapi.h:
-lib/SDL/include/SDL_hints.h:
-lib/SDL/include/SDL_loadso.h:
-lib/SDL/include/SDL_log.h:
-lib/SDL/include/SDL_messagebox.h:
-lib/SDL/include/SDL_metal.h:
-lib/SDL/include/SDL_power.h:
-lib/SDL/include/SDL_render.h:
-lib/SDL/include/SDL_shape.h:
-lib/SDL/include/SDL_system.h:
-lib/SDL/include/SDL_timer.h:
-lib/SDL/include/SDL_version.h:
-lib/SDL/include/SDL_locale.h:
-lib/SDL/include/SDL_misc.h:
-lib/SDL_image/include/SDL_image.h:
-src/shaders/shader.h:
-src/state.h:
+src/util/map.h:
+src/reload.h:
+src/../util/reloadhost.h:
+src/util/resource.h:
 src/defs.h:
-src/util/types.h:
-src/util/macros.h:
-src/config.h:
+src/util/enum.h:
+src/shared_defs.h:
+src/util/rand.h:
+src/util/file.h:
+src/util/dlist.h:
+src/util/llist.h:
+src/util/bitmap.h:
+src/util/image.h:
+src/ext/stb_image.h:
+src/util/sound.h:
+src/level/vertex.h:
+src/level/wall.h:
+src/level/side.h:
+src/level/sector.h:
+src/level/level_defs.h:
+src/level/sectmat.h:
+src/level/sidemat.h:
+src/level/tag.h:
+src/level/lptr.h:
+src/level/block.h:
+src/level/particle.h:
+src/level/path.h:
+src/level/decal.h:
 src/editor/editor.h:
-src/editor/../defs.h:
-src/objects/object.h:
-src/objects/../defs.h:
-src/objects/triangle.h:
-src/objects/cube.h:
-src/editor/ui.h:
+src/gfx/renderer_types.h:
+src/imgui.h:
+lib/cimgui/cimgui.h:
+src/util/color.h:
+src/gfx/opengl.h:
+src/gfx/atlas.h:
+src/gfx/palette.h:
+src/gfx/renderer.h:
+src/gfx/dynbuf.h:
+src/level/level.h:
