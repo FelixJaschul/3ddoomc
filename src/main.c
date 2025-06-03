@@ -49,10 +49,6 @@
 #include "level/level.h"
 #include "level/side.h"
 
-typedef struct {
-    path_hit_t hit;
-} resolve_buellet_data_t;
-
 static void sg_logger_func(
     UNUSED const char* tag,
     uint32_t log_level,
@@ -321,7 +317,7 @@ static void init() {
 
     gfx_batcher_init(&state->batcher);
 
-    // sound_init();
+    sound_init();
 
     ASSERT(!state_new_level(state));
     state->level = malloc(sizeof(*state->level));
@@ -359,6 +355,10 @@ static void deinit() {
     sg_destroy_state(state->sg_state);
     free(state);
 }
+
+typedef struct {
+    path_hit_t hit;
+} resolve_bullet_data_t;
 
 static int resolve_bullet(
     level_t *level,
@@ -542,8 +542,7 @@ static void do_bullet(object_t *player) {
         PATH_TRACE_ADD_OBJECTS);
 }
 
-
-static void resolve_ui() {
+static void do_ui() {
     object_t *player = NULL;
     level_dynlist_each(state->level->objects, it) {
         if ((*it.el)->type_index == OT_PLAYER) {
@@ -552,10 +551,11 @@ static void resolve_ui() {
         }
     }
 
-    if (!player) {
-        return;
+    if (!player) { 
+        return; 
     }
-    
+
+
     const int since_shot = state->time.tick - state->last_shot;
     int frame;
 
@@ -568,26 +568,23 @@ static void resolve_ui() {
         frame = 1 + (since_shot / frame_ticks) % 3;
     }
 
-    // do_ui
-
-    atlas_lookup_t lookup;
     resource_t resource;
+    atlas_lookup_t lookup;
     ivec2s gun_pos;
-    switch (state->gun_mode) {
-    case 0:
-        resource = resource_from("empty.png");
-        gun_pos = IVEC2(-1000,-1000);
-        goto rewrite;
+
+    // LOG("STATE->GUN_MODE: %d", state->gun_mode);
+    /* switch (state->gun_mode) {
+    case 0: break;
     case 1:
         resource = resource_from("HGUN2");
         gun_pos = IVEC2(
             (TARGET_WIDTH
             - aabb_size(lookup.box_px).x)
-            /2 + 0,
+            / 2 + 0,
             -5);
         goto rewrite;
     case 2:
-        resource = resource_from("HGUN4A");
+        resource = resource_from("HGUN4A%c", (char) frame);
         gun_pos = IVEC2(
             (TARGET_WIDTH 
             - aabb_size(lookup.box_px).x) 
@@ -596,18 +593,29 @@ static void resolve_ui() {
         goto rewrite;
     }
 
-    resource = resource_from("HGUN2"); // these are just for init purposes
-                                       // they arent really used
-    gun_pos = IVEC2(0,0);
-
+    resource = resource_from("empty");
+    gun_pos = IVEC2(0,0); 
     
 rewrite:
     atlas_lookup(
         state->atlas, 
         resource, 
         &lookup);
-    // rewrite end
+    // rewrite end */
+
+    resource =
+        resource_from("HGUN4%c", (char) ('A' + frame));
+
+    atlas_lookup(state->atlas, resource, &lookup);
+
+    gun_pos =
+        IVEC2(
+            (TARGET_WIDTH 
+             - aabb_size(lookup.box_px).x) 
+            / 2 + 52, -20);
     
+    // atlas_lookup(state->atlas, resource, &lookup);
+
     const f32 lv = glms_vec2_norm(player->vel);
     state->swing += (32.0f * lv) * state->time.dt;
 
@@ -628,13 +636,13 @@ rewrite:
     }
 
     const bool is_aim =
-        input_get(state->input, "mouse right|left shift") & INPUT_DOWN;
+        input_get(state->input, "mouse_right|left shift") & INPUT_DOWN;
     state->aim_time =
-        max(state->aim_time + 
-                (is_aim 
+        max(state->aim_time 
+            + (is_aim 
                 ? state->time.dt 
                 : -state->time.dt), 
-                0.0f);
+            0.0f);
 
     if (!is_aim && state->aim_factor < 0.01f) {
         state->aim_time = 0.0f;
@@ -642,10 +650,11 @@ rewrite:
     }
 
     state->aim_factor =
-        clamp(state->aim_factor + (
-                    state->time.dt * (
-                        is_aim ? 1 : -1)),
-                0.0f, 0.2f);
+        clamp(
+            state->aim_factor 
+            + (state->time.dt 
+                * (is_aim ? 1 : -1)), 
+            0.0f, 0.2f);
 
     const f32 powx = lerp(1.0f, 0.15f, state->aim_factor / 0.2f);
     const f32 powy = lerp(1.0f, 0.8f, state->aim_factor / 0.2f);
@@ -657,39 +666,31 @@ rewrite:
     gun_pos.x -= 8 * (state->aim_factor / 0.2f);
     gun_pos.y += 16 * (state->aim_factor / 0.2f);
 
-    if (input_get(state->input, "mouse left") & INPUT_PRESS) {
+    if (input_get(state->input, "mouse_left") & INPUT_PRESS) {
         state->last_shot = state->time.tick;
-        state->cbump += lerp(0.02f, 0.05f, max(state->cbump - 1.0f, 0.0f));
+        state->cbump += lerp(0.2f, 0.05f, max(state->cbump - 1.0f, 0.0f));
         state->last_cbump = state->time.tick;
 
-        rand_t rand = 
-            rand_create(state->time.tick);
+        rand_t r = rand_create(state->time.tick);
         const vec3s pos =
             glms_vec3_add(
-                    VEC3(player->pos, player->z + 1.05f),
-                    glms_vec3_scale(state->cam.dir, 1.1f));
+                VEC3(player->pos, player->z + 1.05f),
+                glms_vec3_scale(state->cam.dir, 1.1f));
 
-        particle_t *particle =
-            particle_new(
-                    state->level, 
-                    glms_vec2(pos));
-
+        particle_t *particle = particle_new(state->level, glms_vec2(pos));
         if (particle) {
             particle->type = PARTICLE_TYPE_FLARE;
             particle->z = pos.z;
 
             const f32 angle =
-                player->angle 
-                    + (rand_sign(&rand) 
-                    * (rand_f32(&rand, 1 * PI_6, 4 * PI_6)));
-
+                player->angle + (rand_sign(&r) * (rand_f32(&r, 1 * PI_6, 4 * PI_6)));
             particle->vel_xyz =
                 VEC3(
-                    cosf(angle) * rand_f32(&rand, 10.0f, 16.0f),
-                    -sinf(angle) * rand_f32(&rand, 10.0f, 16.0f),
-                    rand_f32(&rand, 0.0f, 0.5f));
+                    cosf(angle) * rand_f32(&r, 10.0f, 16.0f),
+                    -sinf(angle) * rand_f32(&r, 10.0f, 16.0f),
+                    rand_f32(&r, 0.0f, 0.5f));
             particle->ticks = TICKS_PER_SECOND;
-            particle->flare.color = VEC4(VEC3(0.2), 1.0);   
+            particle->flare.color = VEC4(VEC3(0.2), 1.0);
         }
 
         do_bullet(player);
@@ -699,9 +700,7 @@ rewrite:
         lerp(
             0.0f,
             state->time.dt,
-            clamp((state->time.tick 
-                    - state->last_cbump) 
-                / 20.0f, 0.0f, 1.0f));
+            clamp((state->time.tick - state->last_cbump) / 20.0f, 0.0f, 1.0f));
 
     state->cbump = max(state->cbump - q, 0.0f);
 
@@ -731,7 +730,7 @@ rewrite:
             .scale = VEC2(1),
             .color = VEC4(VEC3(light / (f32) LIGHT_MAX), 1),
             .z = 0.4f,
-            .flags = GFX_NO_FLAGS });    
+            .flags = GFX_NO_FLAGS });
 }
 
 static void frame() {
@@ -986,7 +985,7 @@ static void frame() {
     sg_push_debug_group("2D");
     {
         sg_apply_scissor_rect(0, 0, TARGET_WIDTH, TARGET_HEIGHT, false);
-        resolve_ui(); 
+        do_ui(); 
 
         const mat4s view = glms_mat4_identity();
         const mat4s proj = glms_ortho(0.0f, TARGET_WIDTH, 0.0f, TARGET_HEIGHT, -1.0f, 1.0f);
