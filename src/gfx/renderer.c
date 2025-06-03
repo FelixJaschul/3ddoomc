@@ -667,22 +667,13 @@ static int prepare_decal(renderer_t *r, decal_t *decal) {
         dr_data->plane_type = decal->sector.plane;
     }
 
-    // TODO: data update vs. remesh
-
 done:
     r->data.dirty |= (res != PREPARE_OK);
     return PREPARE_REMESH;
 }
 
-// TODO:
 static int prepare_side(renderer_t *r, side_t *side) {
     int res = PREPARE_OK;
-
-    /* LOG("%d %d %d %d", */
-    /*     !side->render, */
-    /*     side->render && side->render->side != side, */
-    /*     side->render && side->render->version != side->version, */
-    /*     side->render && side->render->r_version != r->version); */
 
     if (side->render && side->render->side != side) {
         LOG("I GOT OVERWRITTEN @ %d",
@@ -727,8 +718,8 @@ static int prepare_side(renderer_t *r, side_t *side) {
     side_get_vertices(side, vs);
 
     const side_texinfo_t *tex_info =
-        (side->flags & SIDE_FLAG_MATOVERRIDE) ?
-            &side->tex_info
+        (side->flags & SIDE_FLAG_MATOVERRIDE) 
+            ? &side->tex_info
             : &side->mat->tex_info;
 
     const bool has_neighbor = side->portal && side->portal->sector;
@@ -740,8 +731,12 @@ static int prepare_side(renderer_t *r, side_t *side) {
         .stflags = tex_info->flags,
         .z_floor = side->sector->floor.z,
         .z_ceil = side->sector->ceil.z,
-        .nz_floor = has_neighbor ? side->portal->sector->floor.z : 0.0f,
-        .nz_ceil = has_neighbor ? side->portal->sector->ceil.z : 0.0f,
+        .nz_floor = has_neighbor 
+            ? side->portal->sector->floor.z 
+            : 0.0f,
+        .nz_ceil = has_neighbor 
+            ? side->portal->sector->ceil.z 
+            : 0.0f,
         .offsets = IVEC_TO_V(tex_info->offsets),
         .sector_index = side->sector->render->index,
         .normal = side_normal(side)
@@ -757,7 +752,6 @@ static int prepare_side(renderer_t *r, side_t *side) {
     atlas_lookup(state->atlas, side->mat->tex_high, &lookup);
     sr_data->tex_high = lookup.id;
 
-    // TODO: data update vs. remesh
 done:
     r->data.dirty |= (res != PREPARE_OK);
     return res;
@@ -775,7 +769,9 @@ static void mesh_side(
     vertex_t *vs[2];
     side_get_vertices(side, vs);
 
-    int flags = seg->portal ? RENDERER_VFLAG_PORTAL : 0;
+    int flags = seg->portal 
+        ? RENDERER_VFLAG_PORTAL 
+        : 0;
 
     switch (seg->index) {
     case SIDE_SEGMENT_WALL: flags |= RENDERER_VFLAG_SEG_MIDDLE; break;
@@ -985,20 +981,22 @@ remesh:
     atlas_lookup(state->atlas, sector->mat->ceil.tex, &lookup);
     sr_data->tex_ceil = lookup.id;
 
-    // TODO: update continuously
-    /* sr_data->light = sector_light(r->level, sector) / (f32) LIGHT_MAX; */
-
     // allocate indices: (3 * 2 (planes) * num tris) + (6 * num sides)
     // same for vertices, but 4/side instead of 6
-    const int
-        ni_expected = (3 * 2 * dynlist_size(sector->tris) + (6 * n_quads)),
-        nv_expected = (3 * 2 * dynlist_size(sector->tris) + (4 * n_quads));
+    const int ni_expected = (3 * 2 * dynlist_size(sector->tris) + (6 * n_quads));
+    const int nv_expected = (3 * 2 * dynlist_size(sector->tris) + (4 * n_quads));
     sr->indices =
-        dynbuf_alloc(&r->db_indices, sizeof(u16) * ni_expected);
+        dynbuf_alloc(
+                &r->db_indices, 
+                sizeof(u16) 
+                * ni_expected);
     sr->n_indices = ni_expected;
 
     sr->vertices =
-        dynbuf_alloc(&r->db_vertices, sizeof(render_vertex_t) * nv_expected);
+        dynbuf_alloc(
+                &r->db_vertices, 
+                sizeof(render_vertex_t) 
+                * nv_expected);
     sr->n_vertices = nv_expected;
 
     u16 *indices = sr->indices;
@@ -1246,7 +1244,6 @@ static void deconstruct_view_matrix(
     if (ppitch) { *ppitch = pitch; }
 }
 
-// TODO: doc
 static bool side_clip(
     const side_t *side,
     const mat4s *proj,
@@ -1261,7 +1258,7 @@ static bool side_clip(
     extract_view_proj_planes(view_proj, planes);
 
     // TODO: use indices, don't need to check same vertices twice
-    // check that vertices are on screen and CCW oriented
+    // check that vertices are on screen 
     const vec3s ps[6] = {
         VEC3(vs[0]->pos, side->sector->floor.z),
         VEC3(vs[1]->pos, side->sector->floor.z),
@@ -1305,29 +1302,16 @@ static bool side_clip(
         ps_view[i] = glms_vec3(glms_mat4_mulv(*view, VEC4(ps_clamp[i], 1.0f)));
     }
 
-    // check for CCW winding on both clamped tris
     int not_ccw = 0;
     for (int i = 0; i < 1; i++) {
-        /* const vec3s */
-        /*     a = glms_vec3_sub( */
-        /*             ps_view[i * 3 + 1], */
-        /*             ps_view[i * 3 + 0]), */
-        /*     b = glms_vec3_sub( */
-        /*             ps_view[i * 3 + 2], */
-        /*             ps_view[i * 3 + 1]); */
-
         const mat3s m = (mat3s) {
             .col = {
                 glms_vec3(glms_mat4_mulv(*view, VEC4(ps[2], 1.0f))),
                 glms_vec3(glms_mat4_mulv(*view, VEC4(ps[1], 1.0f))),
                 glms_vec3(glms_mat4_mulv(*view, VEC4(ps[0], 1.0f))),
-                /* ps_view[2], */
-                /* ps_view[1], */
-                /* ps_view[0], */
             }
         };
 
-        /* const f32 nz = a.x * b.y - a.y * b.x; */
         if (glms_mat3_det(m) > 0) {
             not_ccw++;
         }
@@ -1337,9 +1321,6 @@ static bool side_clip(
         if (state->renderer->debug_ui) {
             igText("rejecting %d, not CCW", side->index);
         }
-
-        // TODO
-        /* return false; */
     }
 
     // screen (pixel) positions
@@ -1447,8 +1428,8 @@ static mat4s clipped_proj_mat(
     const f32 offset = 0.005f;
     const f32 dist_v = -glms_vec3_dot(pos_v, normal_v) + offset;
 
-    // TODO
-    // when close, don't modify - this saves us some z-fighting issues
+    // TODO: when close, don't modify 
+    // - this saves us some z-fighting issues
     if (fabsf(dist_v) < 0.25f) {
         return proj;
     }
@@ -1469,7 +1450,6 @@ static mat4s clipped_proj_mat(
 
     f32 a =
         (2.0f * glms_vec4_dot(proj.col[3], q)) / glms_vec4_dot(c, q);
-    /* a = 1.0f; // TODO */
 
     // row 2 = c - row 3
     f32 *raw = (f32*) proj.raw;
@@ -1606,51 +1586,9 @@ static void do_render_pass(
         };
 
     // accumulate visible sectors
-    DYNLIST(sector_t*) sectors = NULL;
-    if (pass->sector) {
-        level_get_visible_sectors(
-            r->level,
-            pass->sector,
-            &sectors,
-            0);
-    } else {
-        level_dynlist_each(r->level->sectors, it) {
-            *dynlist_push(sectors) = *it.el;
-        }
-    }
-
-    // cull sectors outside of view frustum
-    dynlist_each(sectors, it) {
-        sector_t *s = *it.el;
-        vec2s ps[4];
-        aabbf_points(AABBF_MM(s->min, s->max), ps);
-
-        const render_pass_t *p = pass;
-        while (p && p->entry_side) {
-            for (int i = 0; i < 4; i++) {
-                ps[i] =
-                    portal_transform(
-                        r->level,
-                        p->exit_side,
-                        p->entry_side,
-                        ps[i]);
-            }
-            p = p->from;
-        }
-
-        vec2s mi = ps[0], ma = ps[0];
-        for (int i = 1; i < 4; i++) {
-            mi = glms_vec2_minv(mi, ps[i]);
-            ma = glms_vec2_maxv(ma, ps[i]);
-        }
-
-        const aabbf_t box = AABBF_MM(mi, ma);
-        if (!aabbf_collides(r->frustum_box, box)) {
-            if (r->debug_ui) {
-                igText("culled sector %d", s->index);
-            }
-            dynlist_remove_it(sectors, it);
-        }
+    DYNLIST(sector_t*) sectors = NULL; 
+    level_dynlist_each(r->level->sectors, it) {
+        *dynlist_push(sectors) = *it.el;
     }
 
     // accumulate list of distance-sorted portals
@@ -1669,7 +1607,6 @@ static void do_render_pass(
             side_t *side = srp->side;
             // TODO: breaking recursive portals
             if (side == pass->exit_side) {
-                /* || side == pass->entry_side) { */
                 continue;
             }
 
@@ -1727,7 +1664,7 @@ static void do_render_pass(
     sort(
         portals,
         dynlist_size(portals),
-        sizeof(portals[0]) /* NOLINT */,
+        sizeof(portals[0]), 
         (f_sort_cmp) sector_render_portal_cmp,
         &ref_pos);
 
@@ -1744,11 +1681,6 @@ static void do_render_pass(
             pass->view,
             &proj_portal,
             &view_portal);
-
-        /* sg_apply_scissor_rect( */
-        /*     SVEC2(pass->scissor.min), */
-        /*     SVEC2(aabb_size(pass->scissor)), */
-        /*     false); */
 
         // draw portal outline with EQUAL for stenciling, but INCR where pass
         sg_apply_pipeline(r->pipeline_portal);
@@ -2014,7 +1946,6 @@ static void do_render_pass(
 }
 
 void renderer_render(renderer_t *r) {
-    // TODO
     if (r->debug_ui) { igBegin("DEBUG", NULL, 0); }
 
     r->n_sprites = 0;
@@ -2024,8 +1955,6 @@ void renderer_render(renderer_t *r) {
     }
 
     // TODO: only prepare visible sectors
-    // lappeløsning but needs to be done here since the data buffer must be
-    // done before any draw commands are issued
     level_dynlist_each(r->level->sectors, it) {
         switch (prepare_sector(r, *it.el)) {
         case PREPARE_DATA_UPDATE:

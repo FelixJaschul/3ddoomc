@@ -19,13 +19,10 @@ typedef struct atlas_entry atlas_entry_t;
 typedef struct atlas {
     sg_image image;
 
-    // TODO: doc
     sg_image coords_image, layer_image;
 
     vec4s *coords_data;
     u32 *layer_data;
-
-    // TODO: doc
     int next_entry_id;
 
     // boxes for each layer

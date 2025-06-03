@@ -59,6 +59,7 @@ typedef struct state {
     } fbs;
 
     bool quit;
+    int gun_mode;
     input_t *input;
 
     editor_t *editor;

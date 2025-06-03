@@ -37,8 +37,6 @@ typedef struct sector_render {
 
     // renderer version on construction
     int r_version;
-
-    // corresponding to the verision
     int version;
 
     // pointers into renderer_t buffer
@@ -57,8 +55,6 @@ typedef struct side_render {
 
     // renderer version on construction
     int r_version;
-
-    // corresponds to side_t::version
     int version;
 } side_render_t;
 
@@ -69,8 +65,6 @@ typedef struct decal_render {
 
     // renderer version on construction
     int r_version;
-
-    // corresponds to decal_t::version
     int version;
 
     // pointers into renderer_t buffer
@@ -97,21 +91,15 @@ typedef struct sprite_render {
 } sprite_render_t;
 
 typedef struct renderer_data_array {
-    // sizeof(*_render_t)
     int render_size;
 
-    // *_render_t
     void *renders;
 
     // pointer into image data
     void *data;
 
-    // TODO: add rovers to each bitmap
-
-    // indices allocated
+    // vertices + indices
     BITMAP_DECL(all_bits, 2048);
-
-    // indices allocated this frame (cannot overwrite)
     BITMAP_DECL(frame_bits, 2048);
 } renderer_data_array_t;
 
@@ -132,7 +120,6 @@ typedef struct renderer {
         u64 frame;
     } frame_info;
 
-    // TODO: doc
     sg_image data_image;
 
     // raw data_image data
@@ -166,7 +153,6 @@ typedef struct renderer {
 
     sg_buffer sprite_vbuf, sprite_ibuf, sprite_instbuf;
 
-    // TODO: remove
     int frame_sides;
 
     struct {
@@ -179,15 +165,12 @@ typedef struct renderer {
         int indices[PARTICLE_TYPE_COUNT];
     } particle_data;
 
-    // number of sprites this frame
     int n_sprites;
 
     dynbuf_t db_vertices, db_indices;
 
     // arbitary, when bumped will invalidate all renderer data (force re-mesh)
     int version;
-
-    // optional debug UI
     bool debug_ui;
 } renderer_t;
 

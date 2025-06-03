@@ -110,8 +110,9 @@ LDFLAGS_SHARED += -limguibackend
 LDFLAGS_SHARED += bin/lib/cimgui.dylib
 LDFLAGS_SHARED += -Wl,-rpath -Wl,bin/lib
 
+ROOT      = src
 BIN  	  = bin
-SRC  	  = $(shell find src -name "*.c") $(PATH_GLAD)/src/glad.c
+SRC  	  = $(shell find $(ROOT) -name "*.c") $(PATH_GLAD)/src/glad.c
 OBJ 	  = $(SRC:%.c=$(BIN)/%.o)
 DEP  	  = $(SRC:%.c=$(BIN)/%.d)
 OUT  	  = $(BIN)/game
@@ -131,7 +132,7 @@ TESTOUT = $(TEST:%.c=$(BIN)/%)
 
 TESTEXE = bin/test/runner
 
-SHADERS = src/shaders
+SHADERS = $(ROOT)/shader
 
 SHDSRC = $(shell find $(SHADERS) -name "*.glsl")
 SHDOUT = $(SHDSRC:%.glsl=%.glsl.h)
