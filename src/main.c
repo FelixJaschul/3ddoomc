@@ -53,187 +53,6 @@ typedef struct {
     path_hit_t hit;
 } resolve_buellet_data_t;
 
-/* static int resolve_bullet(
-    level_t *level,
-    const path_hit_t *hit,
-    vec3s *from,
-    vec3s *to,
-    void *) {
-    
-    if (hit->type & T_OBJECT) {
-        if (hit->object.ptr->type_index == OT_PLAYER) {
-            return PATH_TRACE_CONTINUE;
-        }
-        
-        // do random bullet trace
-        for (int i = 0; n = rand_n(&state->rand, 20, 50); i < n; i++) {
-            particle_t *particle = particle_new(level, hit->object.ptr->pos);
-            if (!particle) {
-                continue;
-            }
-
-            particle->type = PARTICLE_TYPE_FLARE;
-            particle->z = hit->object.ptr->z + 0.5f;
-            particle->vel_xyz =
-                glms_vec3_scale(
-                        rand_v3_hemisphere(&state->rand, VEC(0, 0, 1)),
-                        rand_f32(&state->rand, 8.0f, 16.0f));
-            particle->ticks = TICKS_PER_SECOND;
-            particle->flare.color = VEC4(VEC3(0.0), 1.0f);
-        }
-        return PATH_TRACE_STOP;
-    }
-
-    // particle spawn info
-    vec3s part_pos;
-    vec3s part_normal;
-
-    if (hit->type & T_WALL) {
-        bool collide = true;
-
-        side_t * portal = hit->wall.side->portal;
-        LOG("hit a wall %d", hit->wall.side->index);
-
-        if (portal && portal->sector) {
-
-        }
-
-        // no further collision
-        if (!collide) {
-            return PATH_TRACE_CONTINUE;
-        }
-
-        LOG("hit side %d @ %f", hit->wall.side->index, hit->wall.u);
-
-
-    }
-} */
-
-static void resolve_ui() {
-    if (state->mode != GAMEMODE_GAME) {
-        return;
-    }
-
-    object_t *player = NULL;
-    level_dynlist_each(state->level->objects, it) {
-        if ((*it.el)->type_index == OT_PLAYER) {
-            player = *it.el;
-            break;
-        }
-    }
-
-    if (!player) {
-        return;
-    }
-    
-    const int since_shot = state->time.tick - state->last_shot;
-    int frame;
-
-    const int frame_ticks = 5, n_frames = 3;
-    if (since_shot >= frame_ticks * (n_frames + 1)) {
-        frame = 0;
-    } else if (since_shot >= frame_ticks * n_frames) {
-        frame = 2;
-    } else {
-        frame = 1 + (since_shot / frame_ticks) % 3;
-    }
-
-    atlas_lookup_t lookup;
-    resource_t resource;
-    ivec2s gun_pos;
-    switch (state->gun_mode) {
-    case 0:
-        resource = resource_from("empty.png");
-        gun_pos = IVEC2(-1000,-1000);
-        goto rewrite;
-    case 1:
-        resource = resource_from("HGUN2");
-        gun_pos = IVEC2(
-            (TARGET_WIDTH
-            - aabb_size(lookup.box_px).x)
-            /2 + 0,
-            -5);
-        goto rewrite;
-    case 2:
-        resource = resource_from("HGUN4A");
-        gun_pos = IVEC2(
-            (TARGET_WIDTH 
-            - aabb_size(lookup.box_px).x) 
-            / 2 + 52,
-            -20);
-        goto rewrite;
-    }
-
-    resource = resource_from("HGUN2"); // these are just for init purposes
-                                       // they arent really used
-    gun_pos = IVEC2(0,0);
-
-    
-rewrite:
-    atlas_lookup(
-        state->atlas, 
-        resource, 
-        &lookup);
-    // rewrite end
-    
-    const f32 lv = glms_vec2_norm(player->vel);
-    state->swing += (32.0f * lv) * state->time.dt;
-
-    // move towards swing % period = 0.0f
-    const f32 period = 250.0f;
-    const f32 mult = 
-        roundf(
-            state->swing 
-            / (period / 2.0f)) 
-            * (period / 2.0f);
-    
-    if (fabsf(lv) < 1.0f) {
-        state->swing = 
-            lerp(
-                state->swing,
-                lerp(state->swing, mult, 0.1f),
-                (1.0f - lv) / 1.0f);
-    }
-
-    const f32 powx = lerp(1.0f, 0.15f, state->aim_factor / 0.2f);
-    const f32 powy = lerp(1.0f, 0.8f, state->aim_factor / 0.2f);
-
-    const f32 a = TAU * (state->swing / period);
-    gun_pos.x += (powx * 20) * cosf(PI_2 + a);
-    gun_pos.y -= (powy * 8) * fabsf(sinf(a - PI_2));
-
-    gun_pos.x -= 8 * (state->aim_factor / 0.2f);
-    gun_pos.y += 16 * (state->aim_factor / 0.2f);
-
-    if (frame == 1) {
-        gfx_batcher_push_sprite(
-            &state->batcher,
-            &(gfx_sprite_t) {
-                .res = AS_RESOURCE("HFLASH0"),
-                .pos = IVEC_TO_V(glms_ivec2_add(gun_pos, IVEC2(4, 92))),
-                .scale = VEC2(1),
-                .color = VEC4(1),
-                .z = 0.4f,
-                .flags = GFX_NO_FLAGS });
-    }
-
-    u8 light = sector_light(state->level, player->sector);
-
-    if (frame == 1) {
-        light = LIGHT_EXTRA;
-    }
-
-    gfx_batcher_push_sprite(
-        &state->batcher,
-        &(gfx_sprite_t) {
-            .res = resource,
-            .pos = IVEC_TO_V(gun_pos),
-            .scale = VEC2(1),
-            .color = VEC4(VEC3(light / (f32) LIGHT_MAX), 1),
-            .z = 0.4f,
-            .flags = GFX_NO_FLAGS });    
-}
-
 static void sg_logger_func(
     UNUSED const char* tag,
     uint32_t log_level,
@@ -539,6 +358,380 @@ static void deinit() {
     sgp_destroy_state(state->sgp_state);
     sg_destroy_state(state->sg_state);
     free(state);
+}
+
+static int resolve_bullet(
+    level_t *level,
+    const path_hit_t *hit,
+    vec3s *from,
+    vec3s *to,
+    void *) {
+    
+    if (hit->type & T_OBJECT) {
+        if (hit->object.ptr->type_index == OT_PLAYER) {
+            return PATH_TRACE_CONTINUE;
+        }
+        
+        // do random bullet trace
+        for (int i = 0, n = rand_n(&state->rand, 20, 50); i < n; i++) {
+            particle_t *particle = particle_new(level, hit->object.ptr->pos);
+            if (!particle) {
+                continue;
+            }
+
+            particle->type = PARTICLE_TYPE_FLARE;
+            particle->z = hit->object.ptr->z + 0.5f;
+            particle->vel_xyz =
+                glms_vec3_scale(
+                        rand_v3_hemisphere(&state->rand, VEC3(0, 0, 1)),
+                        rand_f32(&state->rand, 8.0f, 16.0f));
+            particle->ticks = TICKS_PER_SECOND;
+            particle->flare.color = VEC4(VEC3(0.0), 1.0f);
+        }
+        return PATH_TRACE_STOP;
+    }
+
+    // particle spawn info
+    vec3s part_pos;
+    vec3s part_normal;
+
+    if (hit->type & T_WALL) {
+        bool collide = true;
+
+        side_t * portal = hit->wall.side->portal;
+        LOG("hit a wall %d", hit->wall.side->index);
+
+        if (portal && portal->sector) {
+            side_segment_t segs[4];
+            side_get_segments(hit->wall.side, segs);
+            ASSERT(segs[SIDE_SEGMENT_MIDDLE].present);
+
+            const f32 z_t = lerp(from->z, to->z, hit->t);
+            if (z_t > segs[SIDE_SEGMENT_MIDDLE].z0
+                && z_t < segs[SIDE_SEGMENT_MIDDLE].z1) {
+                collide = false;
+
+                int res = PATH_TRACE_CONTINUE;
+                f32 portal_angle = 0.0f;
+                if (path_trace_3d_resolve_portal(
+                        level, hit, from, to, &res, &portal_angle,
+                        PATH_TRACE_RESOLVE_PORTAL_NONE)) {
+                    return res;
+                }
+            }
+        }
+
+        // no further collision
+        if (!collide) {
+            return PATH_TRACE_CONTINUE;
+        }
+
+        LOG("hit side %d @ %f", hit->wall.side->index, hit->wall.u);
+
+        vertex_t *vs[2];
+        side_get_vertices(hit->wall.side, vs);
+
+        decal_t *decal = decal_new(state->level);
+
+        decal->type = DT_PLACEHOLDER;
+        decal->tex_base = AS_RESOURCE("XHOLE");
+
+        decal_set_side(level, decal, hit->wall.side);
+
+        decal->side.offsets =
+            VEC2(
+                hit->wall.x,
+                lerp(from->z, to->z, hit->t)
+                    - hit->wall.side->sector->floor.z);
+
+        decal->ticks = 240;
+
+        part_normal = 
+            VEC3(
+                side_normal(hit->wall.side), 
+                0.0f);
+        part_pos =
+            glms_vec3_add(
+                VEC3(hit->swept_pos, lerp(from->z, to->z, hit->t)),
+                glms_vec3_scale(part_normal, 0.001f));
+
+        gfx_debug_point(
+            &(gfx_debug_point_t) {
+                .p = VEC3(hit->swept_pos, lerp(from->z, to->z, hit->t)),
+                .color = VEC4(rand_v3(&state->rand, VEC3(0), VEC3(1)), 1.0),
+                .frames = 5000 });
+    } else {
+        LOG("hit sector %d at %" PRIv2, hit->sector.ptr->index, FMTv2(hit->swept_pos));
+        decal_t *decal = decal_new(state->level);
+        decal->type = DT_PLACEHOLDER;
+        decal->tex_base = AS_RESOURCE("XHOLE");
+
+        decal_set_sector(
+            state->level, decal, hit->sector.ptr, hit->sector.plane);
+
+        decal->sector.pos = hit->swept_pos;
+        decal->ticks = 240;
+
+        decal_recalculate(level, decal);
+
+        const f32 plane_sgn = hit->sector.plane == PLANE_TYPE_FLOOR ? 1 : -1;
+        part_pos =
+            VEC3(
+                hit->swept_pos,
+                hit->sector.ptr->planes[hit->sector.plane].z
+                    + 0.001f * plane_sgn);
+
+        part_normal = 
+            VEC3(0, 0, plane_sgn);
+    } 
+    
+    // do random bullet hit spread
+    for (int i = 0, n = rand_n(&state->rand, 5, 10); i < n; i++) {
+        particle_t *particle = particle_new(level, glms_vec2(part_pos));
+        if (!particle) {
+            continue;
+        }
+
+        particle->type = PARTICLE_TYPE_FLARE;
+        particle->z = part_pos.z;
+        particle->vel_xyz =
+            glms_vec3_scale(
+                    rand_v3_hemisphere(&state->rand, part_normal),
+                    rand_f32(&state->rand, 8.0f, 16.0f));
+        particle->ticks = TICKS_PER_SECOND + rand_n(&state->rand, -15, 15);
+        particle->flare.color = VEC4(VEC3(0.5), 1.0f);
+    }
+
+    return PATH_TRACE_STOP;    
+}
+
+static void do_bullet(object_t *player) {
+    DYNLIST(sector_t*) near_sectors = NULL;
+    level_get_visible_sectors(
+        state->level, player->sector, &near_sectors,
+        LEVEL_GET_VISIBLE_SECTORS_PORTALS);
+
+    dynlist_each(near_sectors, it) {
+        (*it.el)->flags |= SECTOR_FLAG_FLASH;
+    }
+
+    dynlist_free(near_sectors);
+
+    sound_play(AS_RESOURCE("stest0"));
+
+    const vec3s dir = state->cam.dir;
+
+    vec3s
+        from = state->cam.pos,
+        to = glms_vec3_add(state->cam.pos, glms_vec3_scale(dir, 100.0f));
+
+    gfx_debug_line(
+        &(gfx_debug_line_t) {
+            .a = from,
+            .b = to,
+            .color = VEC4(rand_v3(&state->rand, VEC3(0), VEC3(1)), 1.0),
+            .frames = 5000
+        });
+
+    path_trace_3d(
+        state->level,
+        &from, &to,
+        0.0f,
+        (path_trace_3d_resolve_f) resolve_bullet,
+        NULL,
+        PATH_TRACE_ADD_OBJECTS);
+}
+
+
+static void resolve_ui() {
+    object_t *player = NULL;
+    level_dynlist_each(state->level->objects, it) {
+        if ((*it.el)->type_index == OT_PLAYER) {
+            player = *it.el;
+            break;
+        }
+    }
+
+    if (!player) {
+        return;
+    }
+    
+    const int since_shot = state->time.tick - state->last_shot;
+    int frame;
+
+    const int frame_ticks = 5, n_frames = 3;
+    if (since_shot >= frame_ticks * (n_frames + 1)) {
+        frame = 0;
+    } else if (since_shot >= frame_ticks * n_frames) {
+        frame = 2;
+    } else {
+        frame = 1 + (since_shot / frame_ticks) % 3;
+    }
+
+    // do_ui
+
+    atlas_lookup_t lookup;
+    resource_t resource;
+    ivec2s gun_pos;
+    switch (state->gun_mode) {
+    case 0:
+        resource = resource_from("empty.png");
+        gun_pos = IVEC2(-1000,-1000);
+        goto rewrite;
+    case 1:
+        resource = resource_from("HGUN2");
+        gun_pos = IVEC2(
+            (TARGET_WIDTH
+            - aabb_size(lookup.box_px).x)
+            /2 + 0,
+            -5);
+        goto rewrite;
+    case 2:
+        resource = resource_from("HGUN4A");
+        gun_pos = IVEC2(
+            (TARGET_WIDTH 
+            - aabb_size(lookup.box_px).x) 
+            / 2 + 52,
+            -20);
+        goto rewrite;
+    }
+
+    resource = resource_from("HGUN2"); // these are just for init purposes
+                                       // they arent really used
+    gun_pos = IVEC2(0,0);
+
+    
+rewrite:
+    atlas_lookup(
+        state->atlas, 
+        resource, 
+        &lookup);
+    // rewrite end
+    
+    const f32 lv = glms_vec2_norm(player->vel);
+    state->swing += (32.0f * lv) * state->time.dt;
+
+    // move towards swing % period = 0.0f
+    const f32 period = 250.0f;
+    const f32 mult = 
+        roundf(
+            state->swing 
+            / (period / 2.0f)) 
+            * (period / 2.0f);
+    
+    if (fabsf(lv) < 1.0f) {
+        state->swing = 
+            lerp(
+                state->swing,
+                lerp(state->swing, mult, 0.1f),
+                (1.0f - lv) / 1.0f);
+    }
+
+    const bool is_aim =
+        input_get(state->input, "mouse right|left shift") & INPUT_DOWN;
+    state->aim_time =
+        max(state->aim_time + 
+                (is_aim 
+                ? state->time.dt 
+                : -state->time.dt), 
+                0.0f);
+
+    if (!is_aim && state->aim_factor < 0.01f) {
+        state->aim_time = 0.0f;
+        state->cbump = 0.0f;
+    }
+
+    state->aim_factor =
+        clamp(state->aim_factor + (
+                    state->time.dt * (
+                        is_aim ? 1 : -1)),
+                0.0f, 0.2f);
+
+    const f32 powx = lerp(1.0f, 0.15f, state->aim_factor / 0.2f);
+    const f32 powy = lerp(1.0f, 0.8f, state->aim_factor / 0.2f);
+
+    const f32 a = TAU * (state->swing / period);
+    gun_pos.x += (powx * 20) * cosf(PI_2 + a);
+    gun_pos.y -= (powy * 8) * fabsf(sinf(a - PI_2));
+
+    gun_pos.x -= 8 * (state->aim_factor / 0.2f);
+    gun_pos.y += 16 * (state->aim_factor / 0.2f);
+
+    if (input_get(state->input, "mouse left") & INPUT_PRESS) {
+        state->last_shot = state->time.tick;
+        state->cbump += lerp(0.02f, 0.05f, max(state->cbump - 1.0f, 0.0f));
+        state->last_cbump = state->time.tick;
+
+        rand_t rand = 
+            rand_create(state->time.tick);
+        const vec3s pos =
+            glms_vec3_add(
+                    VEC3(player->pos, player->z + 1.05f),
+                    glms_vec3_scale(state->cam.dir, 1.1f));
+
+        particle_t *particle =
+            particle_new(
+                    state->level, 
+                    glms_vec2(pos));
+
+        if (particle) {
+            particle->type = PARTICLE_TYPE_FLARE;
+            particle->z = pos.z;
+
+            const f32 angle =
+                player->angle 
+                    + (rand_sign(&rand) 
+                    * (rand_f32(&rand, 1 * PI_6, 4 * PI_6)));
+
+            particle->vel_xyz =
+                VEC3(
+                    cosf(angle) * rand_f32(&rand, 10.0f, 16.0f),
+                    -sinf(angle) * rand_f32(&rand, 10.0f, 16.0f),
+                    rand_f32(&rand, 0.0f, 0.5f));
+            particle->ticks = TICKS_PER_SECOND;
+            particle->flare.color = VEC4(VEC3(0.2), 1.0);   
+        }
+
+        do_bullet(player);
+    }
+
+    const f32 q =
+        lerp(
+            0.0f,
+            state->time.dt,
+            clamp((state->time.tick 
+                    - state->last_cbump) 
+                / 20.0f, 0.0f, 1.0f));
+
+    state->cbump = max(state->cbump - q, 0.0f);
+
+    if (frame == 1) {
+        gfx_batcher_push_sprite(
+            &state->batcher,
+            &(gfx_sprite_t) {
+                .res = AS_RESOURCE("HFLASH0"),
+                .pos = IVEC_TO_V(glms_ivec2_add(gun_pos, IVEC2(4, 92))),
+                .scale = VEC2(1),
+                .color = VEC4(1),
+                .z = 0.4f,
+                .flags = GFX_NO_FLAGS });
+    }
+
+    u8 light = sector_light(state->level, player->sector);
+
+    if (frame == 1) {
+        light = LIGHT_EXTRA;
+    }
+
+    gfx_batcher_push_sprite(
+        &state->batcher,
+        &(gfx_sprite_t) {
+            .res = resource,
+            .pos = IVEC_TO_V(gun_pos),
+            .scale = VEC2(1),
+            .color = VEC4(VEC3(light / (f32) LIGHT_MAX), 1),
+            .z = 0.4f,
+            .flags = GFX_NO_FLAGS });    
 }
 
 static void frame() {
