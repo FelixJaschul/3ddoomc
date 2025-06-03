@@ -372,7 +372,6 @@ static int resolve_bullet(
             return PATH_TRACE_CONTINUE;
         }
         
-        // do random bullet trace
         for (int i = 0, n = rand_n(&state->rand, 20, 50); i < n; i++) {
             particle_t *particle = particle_new(level, hit->object.ptr->pos);
             if (!particle) {
@@ -484,8 +483,7 @@ static int resolve_bullet(
         part_normal = 
             VEC3(0, 0, plane_sgn);
     } 
-    
-    // do random bullet hit spread
+
     for (int i = 0, n = rand_n(&state->rand, 5, 10); i < n; i++) {
         particle_t *particle = particle_new(level, glms_vec2(part_pos));
         if (!particle) {
@@ -573,48 +571,18 @@ static void do_ui() {
     ivec2s gun_pos;
 
     // LOG("STATE->GUN_MODE: %d", state->gun_mode);
-    /* switch (state->gun_mode) {
-    case 0: break;
+    switch (state->gun_mode) {
     case 1:
         resource = resource_from("HGUN2");
-        gun_pos = IVEC2(
-            (TARGET_WIDTH
-            - aabb_size(lookup.box_px).x)
-            / 2 + 0,
-            -5);
-        goto rewrite;
+        atlas_lookup(state->atlas, resource, &lookup);
+        gun_pos = IVEC2(150, 0);
+        break;
     case 2:
-        resource = resource_from("HGUN4A%c", (char) frame);
-        gun_pos = IVEC2(
-            (TARGET_WIDTH 
-            - aabb_size(lookup.box_px).x) 
-            / 2 + 52,
-            -20);
-        goto rewrite;
+        resource = resource_from("HGUN4%c", (char) ('A' + frame));
+        atlas_lookup(state->atlas, resource, &lookup);
+        gun_pos = IVEC2(200, -20);
+        break;
     }
-
-    resource = resource_from("empty");
-    gun_pos = IVEC2(0,0); 
-    
-rewrite:
-    atlas_lookup(
-        state->atlas, 
-        resource, 
-        &lookup);
-    // rewrite end */
-
-    resource =
-        resource_from("HGUN4%c", (char) ('A' + frame));
-
-    atlas_lookup(state->atlas, resource, &lookup);
-
-    gun_pos =
-        IVEC2(
-            (TARGET_WIDTH 
-             - aabb_size(lookup.box_px).x) 
-            / 2 + 52, -20);
-    
-    // atlas_lookup(state->atlas, resource, &lookup);
 
     const f32 lv = glms_vec2_norm(player->vel);
     state->swing += (32.0f * lv) * state->time.dt;
@@ -709,7 +677,10 @@ rewrite:
             &state->batcher,
             &(gfx_sprite_t) {
                 .res = AS_RESOURCE("HFLASH0"),
-                .pos = IVEC_TO_V(glms_ivec2_add(gun_pos, IVEC2(4, 92))),
+                // TODO: this is only possible for 2 guns lol
+                .pos = state->gun_mode == 2 
+                    ? IVEC_TO_V(glms_ivec2_add(gun_pos, IVEC2(4, 92))) 
+                    : IVEC_TO_V(glms_ivec2_add(gun_pos, IVEC2(53, 50))) ,
                 .scale = VEC2(1),
                 .color = VEC4(1),
                 .z = 0.4f,
