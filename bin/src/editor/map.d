@@ -132,7 +132,7 @@ bin/src/editor/map.o: src/editor/map.c src/editor/map.h \
   lib/sokol/util/sokol_gfx_imgui.h src/gfx/sokol_gfx_ext.h \
   lib/sokol/util/sokol_imgui.h src/gfx/renderer.h src/gfx/atlas.h \
   src/gfx/dynbuf.h src/state.h src/gfx/gfx.h src/reload.h \
-  src/../util/reloadhost.h src/util/rand.h
+  src/../util/reloadhost.h src/util/rand.h src/util/sound.h
 src/editor/map.h:
 src/util/dynlist.h:
 src/util/types.h:
@@ -353,3 +353,4 @@ src/gfx/gfx.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:

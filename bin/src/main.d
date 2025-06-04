@@ -124,9 +124,9 @@ bin/src/main.o: src/main.c lib/soloud/include/soloud_c.h src/util/input.h \
   lib/sokol/util/sokol_gl.h lib/sokol/util/sokol_gfx_imgui.h \
   src/gfx/sokol_gfx_ext.h lib/sokol/util/sokol_imgui.h src/util/map.h \
   src/reload.h src/../util/reloadhost.h src/util/resource.h src/defs.h \
-  src/util/enum.h src/shared_defs.h src/util/rand.h src/util/file.h \
-  src/util/dlist.h src/util/llist.h src/util/bitmap.h src/util/image.h \
-  src/ext/stb_image.h src/util/sound.h src/level/vertex.h \
+  src/util/enum.h src/shared_defs.h src/util/rand.h src/util/sound.h \
+  src/util/file.h src/util/dlist.h src/util/llist.h src/util/bitmap.h \
+  src/util/image.h src/ext/stb_image.h src/level/vertex.h \
   src/level/wall.h src/level/side.h src/level/sector.h \
   src/level/level_defs.h src/level/sectmat.h src/level/sidemat.h \
   src/level/tag.h src/level/lptr.h src/level/block.h \
@@ -332,13 +332,13 @@ src/defs.h:
 src/util/enum.h:
 src/shared_defs.h:
 src/util/rand.h:
+src/util/sound.h:
 src/util/file.h:
 src/util/dlist.h:
 src/util/llist.h:
 src/util/bitmap.h:
 src/util/image.h:
 src/ext/stb_image.h:
-src/util/sound.h:
 src/level/vertex.h:
 src/level/wall.h:
 src/level/side.h:

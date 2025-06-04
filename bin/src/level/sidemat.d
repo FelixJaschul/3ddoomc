@@ -103,7 +103,7 @@ bin/src/level/sidemat.o: src/level/sidemat.c src/level/sidemat.h \
   lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gl.h \
   lib/sokol/util/sokol_gfx_imgui.h src/gfx/sokol_gfx_ext.h \
   lib/sokol/util/sokol_imgui.h src/reload.h src/../util/reloadhost.h \
-  src/util/rand.h
+  src/util/rand.h src/util/sound.h
 src/level/sidemat.h:
 src/defs.h:
 src/util/enum.h:
@@ -259,3 +259,4 @@ lib/sokol/util/sokol_imgui.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:

@@ -125,7 +125,7 @@ bin/src/gfx/gfx.o: src/gfx/gfx.c src/gfx/gfx.h src/gfx/sokol.h \
   lib/SDL/include/SDL_system.h lib/SDL/include/SDL_timer.h \
   lib/SDL/include/SDL_version.h lib/SDL/include/SDL_locale.h \
   lib/SDL/include/SDL_misc.h lib/SDL_image/include/SDL_image.h \
-  src/state.h src/util/rand.h src/shader/batch.glsl.h \
+  src/state.h src/util/rand.h src/util/sound.h src/shader/batch.glsl.h \
   src/shader/basic.glsl.h src/shader/level.glsl.h \
   src/shader/sprite.glsl.h src/shader/screenquad.glsl.h
 src/gfx/gfx.h:
@@ -324,6 +324,7 @@ lib/SDL/include/SDL_misc.h:
 lib/SDL_image/include/SDL_image.h:
 src/state.h:
 src/util/rand.h:
+src/util/sound.h:
 src/shader/batch.glsl.h:
 src/shader/basic.glsl.h:
 src/shader/level.glsl.h:

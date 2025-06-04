@@ -6,6 +6,7 @@
 #include "gfx/sokol.h"
 #include "defs.h"
 #include "util/rand.h"
+#include "util/sound.h"
 
 typedef struct ImGuiContext ImGuiContext;
 typedef struct gfx_state gfx_state_t;
@@ -75,8 +76,15 @@ typedef struct state {
     bool mouse_grab;
     bool mouse_look;
     bool allow_input;
+    
+    // movemnt sound
+    struct {
+        bool mode, w, a, s, d;
+    } input_walking;
 
-    bool walking;
+    struct {
+        sound_id w, a, s, d;
+    } input_id;
 
     sg_imgui_t sg_imgui_state;
     bool sg_imgui_show;
@@ -97,22 +105,6 @@ typedef struct state {
     int last_cbump;
     int last_shot;
     f32 cbump;
-
-    // scratch space for when you want to do weird debugging things, but don't
-    // want the debugger to crash on reload :-)
-    union {
-        struct {
-            void *sp;
-            void *bus;
-            void *filter0;
-            char text[256];
-            f32 freq;
-            f32 speed;
-            f32 declination;
-            int waveform;
-        };
-        u8 scratch[512];
-    };
 } state_t;
 
 // global state storage

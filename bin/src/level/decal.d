@@ -103,7 +103,7 @@ bin/src/level/decal.o: src/level/decal.c src/level/decal.h \
   lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gl.h \
   lib/sokol/util/sokol_gfx_imgui.h src/gfx/sokol_gfx_ext.h \
   lib/sokol/util/sokol_imgui.h src/reload.h src/../util/reloadhost.h \
-  src/util/rand.h
+  src/util/rand.h src/util/sound.h
 src/level/decal.h:
 src/level/level_defs.h:
 src/util/bitmap.h:
@@ -260,3 +260,4 @@ lib/sokol/util/sokol_imgui.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:

@@ -49,6 +49,18 @@
 #include "level/level.h"
 #include "level/side.h"
 
+// TODO: do elsewhere
+#define HANDLE_WALK_KEY(KEY)                                                                \
+    if (!state->input_walking.mode && input_get(state->input, #KEY) & INPUT_PRESS) {        \
+        state->input_id.KEY = sound_play_loop(AS_RESOURCE("swalk0"));                       \
+        state->input_walking.KEY = true;                                                    \
+    } else if (state->input_walking.KEY && input_get(state->input, #KEY) & INPUT_RELEASE) { \
+        sound_stop(state->input_id.KEY);                                                    \
+        state->input_walking.KEY = false;                                                   \
+        state->input_walking.mode = false;                                                  \
+    }
+
+
 static void sg_logger_func(
     UNUSED const char* tag,
     uint32_t log_level,
@@ -207,6 +219,7 @@ static void init() {
     state->allow_input = true;
     state->rand = rand_create(0xDEADBEEF);
     state->gun_mode = 1;
+    state->input_walking.mode = false;
 
     ASSERT(!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO), "failed to init SDL: %s", SDL_GetError());
 
@@ -886,21 +899,48 @@ static void frame() {
         if (state->mode == GAMEMODE_GAME
             && (input_get(state->input, "1") & INPUT_PRESS)) {
             state->mouse_grab = !state->mouse_grab;
-            // state->gun_mode = 0;
-        }
+         }
+ 
+        if (state->mode == GAMEMODE_GAME) {
+            /*if (!state->input_walking.mode && input_get(state->input, "w") & INPUT_PRESS) {
+                state->input_id.w = sound_play_loop(AS_RESOURCE("swalk0"));
+                state->input_walking.w = true;
+            } else if (state->input_walking.w && input_get(state->input, "w") & INPUT_RELEASE) {
+                sound_stop(state->input_id.w);
+                state->input_walking.w = false;
+                state->input_walking.mode = false;
+            }
 
-        if (state->mode == GAMEMODE_GAME
-            && !state->walking
-            && (input_get(state->input, "w") & INPUT_PRESS)) {
-            sound_play_loop(AS_RESOURCE("swalk0"));
-            state->walking = true;
-        }
+            if (!state->input_walking.mode && input_get(state->input, "a") & INPUT_PRESS) {
+                state->input_id.a = sound_play_loop(AS_RESOURCE("swalk0"));
+                state->input_walking.a = true;
+            } else if (state->input_walking.a && input_get(state->input, "a") & INPUT_RELEASE) {
+                sound_stop(state->input_id.a);
+                state->input_walking.a = false;
+                state->input_walking.mode = false;
+            }
 
-         if (state->mode == GAMEMODE_GAME
-            && state->walking
-            && (input_get(state->input, "w") & INPUT_RELEASE)) {
-            sound_stop_all();
-            state->walking = false;
+            if (!state->input_walking.mode && input_get(state->input, "s") & INPUT_PRESS) {
+                state->input_id.s = sound_play_loop(AS_RESOURCE("swalk0"));
+                state->input_walking.s = true;
+            } else if (state->input_walking.s && input_get(state->input, "s") & INPUT_RELEASE) {
+                sound_stop(state->input_id.s);
+                state->input_walking.s = false;
+                state->input_walking.mode = false;
+            }
+
+            if (!state->input_walking.mode && input_get(state->input, "d") & INPUT_PRESS) {
+                state->input_id.d = sound_play_loop(AS_RESOURCE("swalk0"));
+                state->input_walking.d = true;
+            } else if (state->input_walking.d && input_get(state->input, "d") & INPUT_RELEASE) {
+                sound_stop(state->input_id.d);
+                state->input_walking.d = false;
+                state->input_walking.mode = false;
+            }*/
+            HANDLE_WALK_KEY(w);
+            HANDLE_WALK_KEY(a);
+            HANDLE_WALK_KEY(s);
+            HANDLE_WALK_KEY(d);
         }
 
         if (state->mode == GAMEMODE_GAME

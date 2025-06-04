@@ -98,12 +98,12 @@ bin/src/state.o: src/state.c src/state.h src/util/aabb.h \
   lib/sokol/util/sokol_imgui.h src/util/map.h src/util/assert.h \
   src/util/str.h src/util/dynlist.h src/reload.h \
   src/../util/reloadhost.h src/util/resource.h src/defs.h \
-  src/util/enum.h src/shared_defs.h src/util/rand.h src/gfx/atlas.h \
-  src/gfx/renderer.h src/gfx/dynbuf.h src/util/bitmap.h src/util/dlist.h \
-  src/gfx/renderer_types.h src/level/level.h src/level/level_defs.h \
-  src/util/llist.h src/level/io.h src/editor/editor.h src/imgui.h \
-  lib/cimgui/cimgui.h src/level/lptr.h src/util/color.h \
-  src/level/object.h src/util/file.h
+  src/util/enum.h src/shared_defs.h src/util/rand.h src/util/sound.h \
+  src/gfx/atlas.h src/gfx/renderer.h src/gfx/dynbuf.h src/util/bitmap.h \
+  src/util/dlist.h src/gfx/renderer_types.h src/level/level.h \
+  src/level/level_defs.h src/util/llist.h src/level/io.h \
+  src/editor/editor.h src/imgui.h lib/cimgui/cimgui.h src/level/lptr.h \
+  src/util/color.h src/level/object.h src/util/file.h
 src/state.h:
 src/util/aabb.h:
 src/util/macros.h:
@@ -245,6 +245,7 @@ src/defs.h:
 src/util/enum.h:
 src/shared_defs.h:
 src/util/rand.h:
+src/util/sound.h:
 src/gfx/atlas.h:
 src/gfx/renderer.h:
 src/gfx/dynbuf.h:

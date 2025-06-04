@@ -28,4 +28,6 @@ sound_id sound_play(resource_t name);
 
 sound_id sound_play_loop(resource_t name);
 
+void sound_stop(sound_id id);
+
 void sound_stop_all();

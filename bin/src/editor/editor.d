@@ -130,7 +130,7 @@ bin/src/editor/editor.o: src/editor/editor.c src/editor/editor.h \
   lib/SDL/include/SDL_version.h lib/SDL/include/SDL_locale.h \
   lib/SDL/include/SDL_misc.h lib/SDL_image/include/SDL_image.h \
   src/util/sort.h src/state.h src/gfx/gfx.h src/reload.h \
-  src/../util/reloadhost.h src/util/rand.h
+  src/../util/reloadhost.h src/util/rand.h src/util/sound.h
 src/editor/editor.h:
 src/gfx/renderer_types.h:
 src/util/math.h:
@@ -349,3 +349,4 @@ src/gfx/gfx.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:

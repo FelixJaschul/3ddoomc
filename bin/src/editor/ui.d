@@ -132,7 +132,7 @@ bin/src/editor/ui.o: src/editor/ui.c src/editor/ui.h src/editor/ui_misc.h \
   lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gl.h \
   lib/sokol/util/sokol_gfx_imgui.h src/gfx/sokol_gfx_ext.h \
   lib/sokol/util/sokol_imgui.h src/reload.h src/../util/reloadhost.h \
-  src/util/rand.h
+  src/util/rand.h src/util/sound.h
 src/editor/ui.h:
 src/editor/ui_misc.h:
 src/util/math.h:
@@ -353,3 +353,4 @@ lib/sokol/util/sokol_imgui.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:

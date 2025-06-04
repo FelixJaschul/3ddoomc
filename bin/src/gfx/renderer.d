@@ -103,8 +103,8 @@ bin/src/gfx/renderer.o: src/gfx/renderer.c src/gfx/renderer.h \
   src/level/level.h src/level/level_defs.h src/util/llist.h \
   src/level/particle.h src/level/portal.h src/level/sector.h \
   src/level/side.h src/imgui.h lib/cimgui/cimgui.h src/level/wall.h \
-  src/state.h src/util/rand.h src/util/sort.h src/shader/level.glsl.h \
-  src/shader/sprite.glsl.h
+  src/state.h src/util/rand.h src/util/sound.h src/util/sort.h \
+  src/shader/level.glsl.h src/shader/sprite.glsl.h
 src/gfx/renderer.h:
 src/gfx/atlas.h:
 src/defs.h:
@@ -263,6 +263,7 @@ lib/cimgui/cimgui.h:
 src/level/wall.h:
 src/state.h:
 src/util/rand.h:
+src/util/sound.h:
 src/util/sort.h:
 src/shader/level.glsl.h:
 src/shader/sprite.glsl.h:

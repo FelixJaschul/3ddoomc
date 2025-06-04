@@ -102,7 +102,7 @@ bin/src/level/level.o: src/level/level.c src/level/level.h \
   src/gfx/sokol.h lib/sokol/sokol_gfx.h lib/sokol_gp/sokol_gp.h \
   lib/sokol/util/sokol_gl.h lib/sokol/util/sokol_gfx_imgui.h \
   src/gfx/sokol_gfx_ext.h lib/sokol/util/sokol_imgui.h src/util/map.h \
-  src/util/str.h src/util/rand.h
+  src/util/str.h src/util/rand.h src/util/sound.h
 src/level/level.h:
 src/util/bitmap.h:
 src/util/assert.h:
@@ -259,3 +259,4 @@ lib/sokol/util/sokol_imgui.h:
 src/util/map.h:
 src/util/str.h:
 src/util/rand.h:
+src/util/sound.h:

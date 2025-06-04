@@ -100,7 +100,7 @@ bin/src/util/resource.o: src/util/resource.c src/util/resource.h \
   src/util/dynlist.h src/level/level.h src/util/bitmap.h \
   src/level/level_defs.h src/util/dlist.h src/util/llist.h src/state.h \
   src/gfx/gfx.h src/reload.h src/../util/reloadhost.h src/util/rand.h \
-  src/util/file.h
+  src/util/sound.h src/util/file.h
 src/util/resource.h:
 src/util/macros.h:
 src/gfx/atlas.h:
@@ -248,4 +248,5 @@ src/gfx/gfx.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:
 src/util/file.h:

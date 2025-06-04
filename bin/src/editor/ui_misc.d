@@ -129,7 +129,7 @@ bin/src/editor/ui_misc.o: src/editor/ui_misc.c src/editor/ui_misc.h \
   lib/SDL/include/SDL_timer.h lib/SDL/include/SDL_version.h \
   lib/SDL/include/SDL_locale.h lib/SDL/include/SDL_misc.h \
   lib/SDL_image/include/SDL_image.h src/state.h src/gfx/gfx.h \
-  src/reload.h src/../util/reloadhost.h src/util/rand.h
+  src/reload.h src/../util/reloadhost.h src/util/rand.h src/util/sound.h
 src/editor/ui_misc.h:
 src/util/math.h:
 src/config.h:
@@ -342,3 +342,4 @@ src/gfx/gfx.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:

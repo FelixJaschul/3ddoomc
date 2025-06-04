@@ -121,7 +121,15 @@ sound_id sound_play_loop(resource_t name) {
     Wav_setLooping(wav, 1);  // Set looping on
     sound_id id = Soloud_play(ss->soloud, wav);
     Soloud_setVolume(ss->soloud, id, 1.0f);
+    state->input_walking.mode = true;
     return id;
+}
+
+void sound_stop(sound_id id) {
+    sound_state_t *ss = state->sound;
+    if (ss && ss->soloud && id >= 0) {
+        Soloud_stop(ss->soloud, id);
+    }
 }
 
 void sound_stop_all() {

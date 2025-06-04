@@ -100,7 +100,7 @@ bin/src/level/actor.o: src/level/actor.c src/level/actor.h src/defs.h \
   lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gl.h \
   lib/sokol/util/sokol_gfx_imgui.h src/gfx/sokol_gfx_ext.h \
   lib/sokol/util/sokol_imgui.h src/util/map.h src/util/str.h \
-  src/util/rand.h
+  src/util/rand.h src/util/sound.h
 src/level/actor.h:
 src/defs.h:
 src/util/enum.h:
@@ -249,3 +249,4 @@ lib/sokol/util/sokol_imgui.h:
 src/util/map.h:
 src/util/str.h:
 src/util/rand.h:
+src/util/sound.h:

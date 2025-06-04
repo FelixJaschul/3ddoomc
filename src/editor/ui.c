@@ -832,25 +832,7 @@ static bool edit_decal_funcvals(
     case DT_PLACEHOLDER: break;
     case DT_SWITCH: break;
     case DT_BUTTON: break;
-    case DT_RIFT: {
-                      // TODO
-        /* // NOTE: this block applies to *any* decal type which uses portal */
-        /* // funcdata */
-        /* TYPEOF(decal->funcdata.portal) *fd = &decal->funcdata.portal; */
-
-        /* const lptr_t */
-        /*     ptr = lptr_from_typed_index(ed->level, fd->index), */
-        /*     newptr = input_lptr(ed, "PORTAL", T_DECAL, ptr); */
-
-        /* if (!LPTR_IS_NULL(newptr) */
-        /*     && !LPTR_EQ(newptr, LPTR_FROM(decal))) { */
-        /*     fd->index = lptro_typed_index(newptr); */
-        /* } */
-
-        /* sameline(); */
-        /* if (igButton("CLEAR", (ImVec2) { 0, 0 })) { */
-        /*     fd->index = LEVEL_TYPED_INDEX_NULL; */
-        /* } */
+    case DT_RIFT: { 
     } break;
     default: WARN("inavlid decal type %d", decal->type); break;
     }
@@ -1002,16 +984,7 @@ static bool edit_object(editor_t *ed, object_t *object, int flags) {
     }
 
     switch (object->type_index) {
-    case OT_PICKUP: {
-                        // TODO
-        /* change |= */
-            /* input_enum( */
-            /*     "ITEM", */
-            /*     &object->funcdata.pickup.item, */
-            /*     sizeof(item_type), */
-            /*     ITEM_DISTINCT, */
-            /*     item_names(), */
-            /*     item_nth_value); */
+    case OT_PICKUP: { 
     } break;
     default: break;
     }
@@ -1045,11 +1018,7 @@ static bool edit_object(editor_t *ed, object_t *object, int flags) {
     igPopItemWidth();
 
     igEndGroup();
-    igPopID();
-
-    if (change) {
-        // TODO: object_recalculate(ed->level, object);
-    }
+    igPopID(); 
 
     return change;
 }
@@ -1155,6 +1124,21 @@ static void edit_status(editor_t *ed) {
         sizeof(statusline),
         &ed->statusline.changetick,
         ed->cur.mode != CM_DEFAULT);
+
+    // current mouse pos
+    igPushStyleColor_U32(ImGuiCol_TableRowBg, IM_COL32(64, 64, 64, 64));
+    igPushStyleColor_U32(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
+    if (igBeginTable(
+            "cursor", 1, ImGuiTableFlags_RowBg,
+            (ImVec2) { 0, 0 }, 0)) {
+        igTableNextRow(ImGuiTableRowFlags_None, 0);
+        igTableSetColumnIndex(0);
+        char text[512];
+        lptr_to_fancy_str(text, sizeof(text), ed->level, ed->cur.hover);
+        igText("CURSOR: %s, %s", text, text);
+        igEndTable();
+    }
+    igPopStyleColor(2);
 
     // current hover
     igPushStyleColor_U32(ImGuiCol_TableRowBg, IM_COL32(64, 64, 64, 64));

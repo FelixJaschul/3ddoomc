@@ -69,7 +69,9 @@ static void decal_placement_pos(
         const vec2s wall_to_pos = glms_vec2_sub(pos, wall_midpoint(wall));
 
         for (int i = 0; i < 2; i++) {
-            if (!wall->sides[i]) { continue; }
+            if (!wall->sides[i]) { 
+                continue; 
+            }
 
             // check that pos is on this side of wall
             if (glms_vec2_dot(

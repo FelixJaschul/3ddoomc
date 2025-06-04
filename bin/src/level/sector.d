@@ -104,7 +104,7 @@ bin/src/level/sector.o: src/level/sector.c src/level/sector.h \
   lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gl.h \
   lib/sokol/util/sokol_gfx_imgui.h src/gfx/sokol_gfx_ext.h \
   lib/sokol/util/sokol_imgui.h src/reload.h src/../util/reloadhost.h \
-  lib/glutess/glutess.h
+  src/util/sound.h lib/glutess/glutess.h
 src/level/sector.h:
 src/level/level_defs.h:
 src/util/bitmap.h:
@@ -264,4 +264,5 @@ src/gfx/sokol_gfx_ext.h:
 lib/sokol/util/sokol_imgui.h:
 src/reload.h:
 src/../util/reloadhost.h:
+src/util/sound.h:
 lib/glutess/glutess.h:

@@ -102,7 +102,7 @@ bin/src/level/sectmat.o: src/level/sectmat.c src/level/sectmat.h \
   src/gfx/sokol.h lib/sokol/sokol_gfx.h lib/sokol_gp/sokol_gp.h \
   lib/sokol/util/sokol_gl.h lib/sokol/util/sokol_gfx_imgui.h \
   src/gfx/sokol_gfx_ext.h lib/sokol/util/sokol_imgui.h src/reload.h \
-  src/../util/reloadhost.h src/util/rand.h
+  src/../util/reloadhost.h src/util/rand.h src/util/sound.h
 src/level/sectmat.h:
 src/defs.h:
 src/util/enum.h:
@@ -257,3 +257,4 @@ lib/sokol/util/sokol_imgui.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:

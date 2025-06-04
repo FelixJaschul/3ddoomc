@@ -100,7 +100,7 @@ bin/src/level/vertex.o: src/level/vertex.c src/level/vertex.h src/defs.h \
   lib/sokol_gp/sokol_gp.h lib/sokol/util/sokol_gl.h \
   lib/sokol/util/sokol_gfx_imgui.h src/gfx/sokol_gfx_ext.h \
   lib/sokol/util/sokol_imgui.h src/util/map.h src/util/str.h \
-  src/reload.h src/../util/reloadhost.h src/util/rand.h
+  src/reload.h src/../util/reloadhost.h src/util/rand.h src/util/sound.h
 src/level/vertex.h:
 src/defs.h:
 src/util/enum.h:
@@ -251,3 +251,4 @@ src/util/str.h:
 src/reload.h:
 src/../util/reloadhost.h:
 src/util/rand.h:
+src/util/sound.h:
