@@ -48,7 +48,6 @@ enum {
     DATA_REALLOC_FAIL
 };
 
-// TODO: doc
 ALWAYS_INLINE int data_array_realloc(
     renderer_t *r,
     renderer_data_array_t *data,
@@ -1391,22 +1390,12 @@ static bool side_clip(
     // clip against existing scissor rect
     if (aabb_collides(*scissor_out, scissor)) {
         *scissor_out = aabb_intersect(*scissor_out, scissor);
-        /* *scissor_out = AABB_MM(IVEC2(0), IVEC2(TARGET_3D_WIDTH, TARGET_3D_HEIGHT)); */
         return true;
     } else {
         return false;
     }
 }
 
-// from Eric Lengyel's "Oblique View Frustum Depth Projection and Clipping"
-// terathon.com/code/oblique.html
-//
-// takes a projection matrix, an "out" view matrix, and a world space position
-// and normal - returns the projection matrix with its near pline adjusted such
-// that it aligns with the plane defined by position/normal
-//
-// our version takes in a position and normal and converts that to the camera
-// space plane
 static mat4s clipped_proj_mat(
     const side_t *out,
     mat4s proj,
@@ -1742,11 +1731,6 @@ static void do_render_pass(
                 .from = pass,
             });
 
-        /* sg_apply_scissor_rect( */
-        /*     SVEC2(pass->scissor.min), */
-        /*     SVEC2(aabb_size(pass->scissor)), */
-        /*     false); */
-
         // draw again to decrement
         sg_apply_pipeline(r->pipeline_portal);
 
@@ -1826,11 +1810,6 @@ static void do_render_pass(
         glColorMaski(1, GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         glDepthMask(GL_TRUE);
     }
-
-/*     sg_apply_scissor_rect( */
-/*         SVEC2(pass->scissor.min), */
-/*         SVEC2(aabb_size(pass->scissor)), */
-/*         false); */
 
     // draw regular level geometry
     sg_apply_pipeline(r->pipeline_level);
@@ -1939,14 +1918,18 @@ static void do_render_pass(
         glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_KEEP, GL_KEEP);
     }
 
-    if (ui) { igTreePop(); }
+    if (ui) { 
+        igTreePop(); 
+    }
 
     dynlist_free(portals);
     dynlist_free(sectors);
 }
 
 void renderer_render(renderer_t *r) {
-    if (r->debug_ui) { igBegin("DEBUG", NULL, 0); }
+    if (r->debug_ui) { 
+        igBegin("DEBUG", NULL, 0); 
+    }
 
     r->n_sprites = 0;
 
@@ -1954,7 +1937,6 @@ void renderer_render(renderer_t *r) {
         bitmap_fill(r->data_arrays[i].frame_bits, 2048, false);
     }
 
-    // TODO: only prepare visible sectors
     level_dynlist_each(r->level->sectors, it) {
         switch (prepare_sector(r, *it.el)) {
         case PREPARE_DATA_UPDATE:
@@ -1996,27 +1978,27 @@ void renderer_render(renderer_t *r) {
             });
     }
 
-    const vec3s
-        dir =
+    const vec3s dir =
             glms_vec3_normalize(
                 VEC3(
                     cosf(r->cam.pitch) * cosf(r->cam.yaw),
                     cosf(r->cam.pitch) * sinf(-r->cam.yaw),
-                    sinf(r->cam.pitch))),
-        up = VEC3(0, 0, 1);
+                    sinf(r->cam.pitch)));
 
-    const mat4s
-        view =
+    const vec3s up = VEC3(0, 0, 1);
+
+    const mat4s view =
             glms_lookat(
                 r->cam.pos,
                 glms_vec3_add(dir, r->cam.pos),
-                up),
-        proj =
+                up);
+    const mat4s proj =
             glms_perspective(
                 deg2rad(80.0f - lerp(0.0f, 16.0f, state->aim_factor / 0.2f)),
                 TARGET_3D_WIDTH / (f32) TARGET_3D_HEIGHT,
                 0.0025f,
                 128.0f);
+
     r->view = view;
     r->proj = proj;
     r->view_proj = glms_mat4_mul(r->proj, r->view);
@@ -2035,13 +2017,20 @@ void renderer_render(renderer_t *r) {
             .from = NULL
         });
 
-    if (r->n_sprites > (int) (SPRITE_INSTBUF_SIZE / sizeof(sprite_instance_t))) {
+    if (r->n_sprites > (int) (
+        SPRITE_INSTBUF_SIZE 
+            / sizeof(sprite_instance_t))) {
         WARN("too many sprites! (%d)", r->n_sprites);
         r->n_sprites =
-            min(r->n_sprites, SPRITE_INSTBUF_SIZE / sizeof(sprite_instance_t));
+            min(
+                r->n_sprites, 
+                SPRITE_INSTBUF_SIZE 
+                / sizeof(sprite_instance_t));
     }
 
-    if (r->debug_ui) { igEnd(); }
+    if (r->debug_ui) { 
+        igEnd(); 
+    }
 }
 
 vec4s renderer_info_at(renderer_t *r, ivec2s pos) {
@@ -2052,14 +2041,19 @@ vec4s renderer_info_at(renderer_t *r, ivec2s pos) {
 
         r->frame_info.size = frame_size;
         r->frame_info.data =
-            malloc(r->frame_info.size.x * r->frame_info.size.y * sizeof(vec4s));
+            malloc(
+                r->frame_info.size.x 
+                * r->frame_info.size.y 
+                * sizeof(vec4s));
     }
 
     if (r->frame_info.frame != state->time.frame) {
         sg_query_image_pixels(
             state->fbs.primary.info,
             r->frame_info.data,
-            r->frame_info.size.x * r->frame_info.size.y * sizeof(vec4s));
+            r->frame_info.size.x 
+                * r->frame_info.size.y 
+                * sizeof(vec4s));
     }
 
     return r->frame_info.data[pos.y * frame_size.x + pos.x];

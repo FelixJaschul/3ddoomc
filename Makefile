@@ -17,7 +17,7 @@ else
 endif
 
 ifeq ($(UNAME), Darwin)
-	SHDC = lib/sokol-tools-bin/bin/osx_arm64/sokol-shdc
+	SHDC = lib/sokol-tools/osx-ninja-release/sokol-shdc
 else
 	# TODO
 endif

@@ -9,6 +9,7 @@ typedef void *Soloud;
 typedef struct sound_state {
     Soloud *soloud;
     map_t sounds;
+    map_t handles;
 } sound_state_t;
 
 typedef unsigned int sound_id;
@@ -24,3 +25,7 @@ void sound_clear();
 
 // TODO: doc
 sound_id sound_play(resource_t name);
+
+sound_id sound_play_loop(resource_t name);
+
+void sound_stop_all();

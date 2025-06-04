@@ -14,6 +14,8 @@
 #define RENDERER_MAX_SIDES RENDERER_DATA_IMG_LENGTH
 #define RENDERER_MAX_DECALS RENDERER_DATA_IMG_LENGTH
 
+#define LEVEL_WIREFRAME_IBUF_SIZE (LEVEL_IBUF_SIZE)
+
 typedef struct sprite_instance {
     vec3s offset;
     vec2s size;
@@ -144,7 +146,7 @@ typedef struct renderer {
             renderer_data_array_t data_arrays[4];
         };
     };
-
+    
     sg_pipeline pipeline_level, pipeline_portal, pipeline_sprite;
     sg_shader shader_level, shader_sprite;
 

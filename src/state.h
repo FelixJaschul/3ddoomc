@@ -59,7 +59,7 @@ typedef struct state {
     } fbs;
 
     bool quit;
-    int gun_mode;
+    int gun_mode; 
     input_t *input;
 
     editor_t *editor;
@@ -75,6 +75,8 @@ typedef struct state {
     bool mouse_grab;
     bool mouse_look;
     bool allow_input;
+
+    bool walking;
 
     sg_imgui_t sg_imgui_state;
     bool sg_imgui_show;

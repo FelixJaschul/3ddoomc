@@ -91,3 +91,42 @@ sound_id sound_play(resource_t name) {
     Soloud_setVolume(ss->soloud, id, 1.0f);
     return id;
 }
+
+sound_id sound_play_loop(resource_t name) {
+    strtoupper(name.name);
+    sound_state_t *ss = state->sound;
+
+    Wav **pwav = map_find(Wav*, &ss->sounds, RESOURCE_STR(name)), *wav = NULL;
+
+    if (!pwav) {
+        char path[1024];
+        if (!resource_find_file(name, SOUNDS_BASE_DIR, "wav", path, sizeof(path))) {
+            WARN("could not find sound %s", name.name);
+            return -1;
+        }
+
+        wav = Wav_create();
+        if (!wav) return -1;
+
+        if (Wav_load(wav, path)) {
+            Wav_destroy(wav);
+            return -1;
+        }
+
+        map_insert(&ss->sounds, strdup(name.name), wav);
+    } else {
+        wav = *pwav;
+    }
+
+    Wav_setLooping(wav, 1);  // Set looping on
+    sound_id id = Soloud_play(ss->soloud, wav);
+    Soloud_setVolume(ss->soloud, id, 1.0f);
+    return id;
+}
+
+void sound_stop_all() {
+    sound_state_t *ss = state->sound;
+    if (ss && ss->soloud) {
+        Soloud_stopAll(ss->soloud);
+    }
+}

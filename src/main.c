@@ -515,7 +515,7 @@ static void do_bullet(object_t *player) {
 
     dynlist_free(near_sectors);
 
-    sound_play(AS_RESOURCE("stest0"));
+    sound_play(AS_RESOURCE("sshoot0"));
 
     const vec3s dir = state->cam.dir;
 
@@ -887,6 +887,20 @@ static void frame() {
             && (input_get(state->input, "1") & INPUT_PRESS)) {
             state->mouse_grab = !state->mouse_grab;
             // state->gun_mode = 0;
+        }
+
+        if (state->mode == GAMEMODE_GAME
+            && !state->walking
+            && (input_get(state->input, "w") & INPUT_PRESS)) {
+            sound_play_loop(AS_RESOURCE("swalk0"));
+            state->walking = true;
+        }
+
+         if (state->mode == GAMEMODE_GAME
+            && state->walking
+            && (input_get(state->input, "w") & INPUT_RELEASE)) {
+            sound_stop_all();
+            state->walking = false;
         }
 
         if (state->mode == GAMEMODE_GAME

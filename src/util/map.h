@@ -47,13 +47,16 @@ enum {
 // hash functions
 hash_t map_hash_id(void *p, void*);
 hash_t map_hash_str(void *p, void*);
+// uint64_t map_hash_u32(const void *key);
 
 // compare functions
 int map_cmp_id(void *p, void *q, void*);
 int map_cmp_str(void *p, void *q, void*);
+// int map_cmp_u32(const void *a, const void *b);
 
 // duplication functions
 void *map_dup_str(void *s, void*);
+// void *map_dup_u32(const void *p);
 
 // default map_alloc_fn implemented with stdlib's "realloc()"
 void *map_default_alloc(size_t n, void *p, void*);
@@ -273,6 +276,10 @@ hash_t map_hash_str(void *p, void*) {
     return h;
 }
 
+/* uint64_t map_hash_u32(const void *key) {
+    return (uint64_t)(*(const uint32_t*)key);
+} */
+
 int map_cmp_id(void *p, void *q, void*) {
     return (int) (((char*) p) - ((char*) (q)));
 }
@@ -281,9 +288,19 @@ int map_cmp_str(void *p, void *q, void*) {
     return strcmp(p, q);
 }
 
+/* int map_cmp_u32(const void *a, const void *b) {
+    return (*(const uint32_t*)a) - (*(const uint32_t*)b);
+} */
+
 void *map_dup_str(void *s, void*) {
     return strdup(s);
 }
+
+/* void *map_dup_u32(const void *p) {
+    uint32_t *dup = malloc(sizeof(uint32_t));
+    *dup = *(const uint32_t*)p;
+    return dup;
+} */
 
 void *map_default_alloc(size_t n, void *p, void*) {
     return realloc(p, n);
