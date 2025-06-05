@@ -140,6 +140,10 @@ typedef struct side_segment {
     bool mesh    : 1;
     int index;
     f32 z0, z1;
+    f32 z0_v0; // bottom edge (wall->v0 side)
+    f32 z0_v1; // bottom edge (wall->v1 side)
+    f32 z1_v0; // top edge (first vertex)
+    f32 z1_v1; // top edge (second vertex)
 } side_segment_t;
 
 #define SIDEMAT_NOMAT 0
@@ -166,11 +170,21 @@ typedef struct sidemat {
     LEVEL_DECL_STRUCT_FIELDS()
 } sidemat_t;
 
+
+
 // floor or ceiling plane, belongs to sector
 typedef struct plane {
     // READ VALUES
     f32 z;
     ivec2s offsets;
+
+    vec3s normal;
+    f32 d_constant;
+
+    // user-editable slope parameters
+    bool slope_enabled;
+    f32 slope_angle_deg;
+    f32 slope_direction_deg;
 } plane_t;
 
 // material of plane
@@ -178,6 +192,12 @@ typedef struct planemat {
     resource_t tex;
     ivec2s offset;
 } planemat_t;
+
+// where is slope for plane
+typedef enum {
+    PLANE_TYPE_SLOPE_FLOOR,
+    PLANE_TYPE_SLOPE_CEIL
+} plane_slope_type_t;
 
 typedef struct sect_tri {
     union {

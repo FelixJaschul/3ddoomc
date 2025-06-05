@@ -1126,7 +1126,7 @@ static void edit_status(editor_t *ed) {
         ed->cur.mode != CM_DEFAULT);
 
     // current mouse pos
-    igPushStyleColor_U32(ImGuiCol_TableRowBg, IM_COL32(64, 64, 64, 64));
+    /*igPushStyleColor_U32(ImGuiCol_TableRowBg, IM_COL32(64, 64, 64, 64));
     igPushStyleColor_U32(ImGuiCol_Text, IM_COL32(255, 255, 255, 255));
     if (igBeginTable(
             "cursor", 1, ImGuiTableFlags_RowBg,
@@ -1138,7 +1138,7 @@ static void edit_status(editor_t *ed) {
         igText("CURSOR: %s, %s", text, text);
         igEndTable();
     }
-    igPopStyleColor(2);
+    igPopStyleColor(2); */
 
     // current hover
     igPushStyleColor_U32(ImGuiCol_TableRowBg, IM_COL32(64, 64, 64, 64));
