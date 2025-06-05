@@ -283,6 +283,15 @@ build-shared: dirs $(OBJ)
 build: dirs shaders $(OBJ)
 	$(LD) -o $(OUT) $(filter %.o,$^) $(LDFLAGS_STATIC)
 
+add-code:
+	git add .
+
+commit-code: add-code
+	git commit -a -m "I was done from markdown"
+
+push-code: commit-code
+	git push --force
+
 clean-obj:
 	rm -rf bin/src bin/util bin/test
 

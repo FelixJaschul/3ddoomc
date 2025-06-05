@@ -1,5 +1,6 @@
 #include "util/sound.h"
 #include "state.h"
+#include "util/input.h"
 
 #include <soloud_c.h>
 
@@ -121,7 +122,6 @@ sound_id sound_play_loop(resource_t name) {
     Wav_setLooping(wav, 1);  // Set looping on
     sound_id id = Soloud_play(ss->soloud, wav);
     Soloud_setVolume(ss->soloud, id, 1.0f);
-    state->input_walking.mode = true;
     return id;
 }
 

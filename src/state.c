@@ -47,11 +47,6 @@ int state_new_level(state_t *state) {
         renderer_set_level(state->renderer, state->level);
     }
 
-    // TODO: use player spawn point
-    /* state->render.camera.pos = (v2) { 1, 1 }; */
-    /* state->render.camera.angle = 0.0; */
-    /* state->render.camera.sect = NULL; */
-    /* state->render.camera.z = EYE_Z; */
     return 0;
 }
 

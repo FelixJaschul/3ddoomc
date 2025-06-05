@@ -6,13 +6,18 @@
 
 typedef void *Soloud;
 
+typedef unsigned int sound_id;
+
+
 typedef struct sound_state {
     Soloud *soloud;
     map_t sounds;
     map_t handles;
 } sound_state_t;
 
-typedef unsigned int sound_id;
+typedef struct sound_id {
+    sound_id walking;
+} sound_id_t;
 
 // init sound system
 int sound_init();

@@ -70,6 +70,9 @@ typedef struct state {
     gfx_state_t *gfx_state;
     palette_t *palette;
     sound_state_t *sound;
+    sound_id_t sound_id;
+
+    bool is_walking;
 
     game_mode mode;
 
@@ -77,15 +80,6 @@ typedef struct state {
     bool mouse_look;
     bool allow_input;
     
-    // movemnt sound
-    struct {
-        bool mode, w, a, s, d;
-    } input_walking;
-
-    struct {
-        sound_id w, a, s, d;
-    } input_id;
-
     sg_imgui_t sg_imgui_state;
     bool sg_imgui_show;
 

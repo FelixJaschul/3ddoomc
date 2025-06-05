@@ -4,7 +4,6 @@
 #include "util/macros.h"
 #include "util/types.h"
 #include "util/dynlist.h"
-#include "util/math.h"
 
 #define INPUT_PRESENT      (1 << 7)
 #define INPUT_REPEAT       (1 << 3)
@@ -34,7 +33,7 @@ typedef struct input {
         };
 
         struct { u8 state; u64 time; } buttons[SDL_NUM_SCANCODES + 3];
-    };
+    }; 
 
     // buttons which must have PRESS/RELEASE reset
     DYNLIST(int) clear;
