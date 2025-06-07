@@ -550,6 +550,91 @@ static bool edit_plane(
             (int[]) { ((u8*) &plane->z) - ((u8*) sector) },
             1,
             NULL, NULL);
+
+    // add slope controls on the next line
+    /* igSpacing();
+
+    // create a label for the slope
+    char slope_label[64];
+    snprintf(
+        slope_label, sizeof(slope_label),
+        "%s SLOPE",
+        type == PLANE_TYPE_CEIL ? "CEIL" : "FLOOR");
+
+    // store old values to detect changes
+    float old_angle = plane->slope_angle_deg;
+    float old_direction = plane->slope_direction_deg;
+    bool old_enabled = plane->slope_enabled;
+
+    // slope height input
+    igSetNextItemWidth(INPUT_WIDTH_INT);
+    change |= igInputFloat("##slope", &plane->slope_angle_deg, 0.25f, 1.0f, "%.3f", 0);
+
+    // If angle changed, update slope_enabled
+    if (old_angle != plane->slope_angle_deg) {
+        plane->slope_enabled = (plane->slope_angle_deg > 0.001f);
+        change = true;
+    }
+
+    sameline();
+    change |=
+        input_copy_apply(
+            ed, slope_label,
+            LPTR_FROM(sector),
+            &plane->slope_angle_deg,
+            sizeof(plane->slope_angle_deg),
+            (int[]) { T_SECTOR },
+            (int[]) { ((u8*) &plane->slope_angle_deg) - ((u8*) sector) },
+            1,
+            NULL, NULL);
+
+    // SIDE
+    sameline();
+    igSetNextItemWidth(80);
+    const char* sides[] = { "SIDE 1", "SIDE 2", "SIDE 3", "SIDE 4" };
+    int current_side = (int)(plane->slope_direction_deg / 90.0f) % 4;
+
+    if (igBeginCombo("##side", sides[current_side], 0)) {
+        for (int i = 0; i < 4; i++) {
+            bool is_selected = (current_side == i);
+            if (igSelectable_Bool(sides[i], is_selected, 0, (ImVec2){0,0})) {
+                plane->slope_direction_deg = i * 90.0f;
+
+                // If we have a non-zero angle, make sure slope is enabled
+                if (plane->slope_angle_deg > 0.001f) {
+                    plane->slope_enabled = true;
+                }
+
+                change = true;
+            }
+            if (is_selected) {
+                igSetItemDefaultFocus();
+            }
+        }
+        igEndCombo();
+    }
+
+    // always ensure slope_enabled is consistent with angle
+    if (plane->slope_angle_deg > 0.001f) {
+        if (!plane->slope_enabled) {
+            plane->slope_enabled = true;
+            change = true;
+        }
+    } else {
+        if (plane->slope_enabled) {
+            plane->slope_enabled = false;
+            change = true;
+        }
+    }
+
+    // debug output if values changed
+    if (old_angle != plane->slope_angle_deg ||
+        old_direction != plane->slope_direction_deg ||
+        old_enabled != plane->slope_enabled) {
+        printf("Slope updated: enabled=%d, angle=%.2f, direction=%.2f\n",
+               plane->slope_enabled, plane->slope_angle_deg, plane->slope_direction_deg);
+    } */
+
     igEndGroup();
     igPopID();
     return change;
@@ -563,20 +648,20 @@ static bool edit_sector_funcvals(
     switch (sector->func_type) {
     case SCFT_NONE: return false;
     case SCFT_DIFF: {
-                        // TODO
-        /* TYPEOF(sector->funcdata.diff) *fd = &sector->funcdata.diff; */
-        /* igSetNextItemWidth(INPUT_WIDTH_INT); */
-        /* change |= input_i16("DIFF", &fd->diff, 1, 16, 0); */
-        /* igSetNextItemWidth(INPUT_WIDTH_INT); */
-        /* change |= input_i16("TICKS", &fd->ticks, 1, 16, 0); */
-        /* change |= */
-        /*     input_enum( */
-        /*         "PLANE", */
-        /*         &fd->plane, */
-        /*         sizeof(plane_type), */
-        /*         2, */
-        /*         (const char *[]) { "FLOOR", "CEIL" }, */
-        /*         NULL); */
+        // TODO
+        /*TYPEOF(sector->funcdata.diff) *fd = &sector->funcdata.diff; 
+        igSetNextItemWidth(INPUT_WIDTH_INT); 
+        change |= input_i16("DIFF", &fd->diff, 1, 16, 0); 
+        igSetNextItemWidth(INPUT_WIDTH_INT); 
+        change |= input_i16("TICKS", &fd->ticks, 1, 16, 0); 
+        change |= 
+             input_enum( 
+                 "PLANE", 
+                 &fd->plane, 
+                 sizeof(plane_type), 
+                 2, 
+                 (const char *[]) { "FLOOR", "CEIL" }, 
+                 NULL);  */
     } break;
     case SCFT_DOOR: {
         // tODO
